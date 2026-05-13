@@ -1,0 +1,32 @@
+Package: inferMM
+Type: Package
+Title: Variance-Aware Michaelis-Menten Estimation and Inference
+Version: 0.0.1
+Authors@R: c(
+    person(given = "Mijeong", family = "Kim", role = c("aut", "cre"),
+           email = "m.kim@ewha.ac.kr"),
+    person(given = "Minkyoung", family = "Cha", role = "aut"),
+    person(given = "Ah Young", family = "Jeong", role = "aut")
+  )
+Description: Tools for variance-aware Michaelis-Menten estimation, model
+    screening, grouped enzyme-kinetic analyses, and clustered repeated-
+    measurement workflows. The package implements profile-score estimators
+    under working variance functions, together with a lightweight cluster-
+    aware working-covariance extension, Wald and bootstrap confidence
+    intervals, prediction utilities, and simulation helpers.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 4.1.0)
+Imports:
+    graphics,
+    grDevices,
+    stats
+Suggests:
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
