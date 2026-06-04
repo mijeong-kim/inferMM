@@ -1,7 +1,10 @@
 # inferMM
 
 `inferMM` provides variance-aware Michaelis-Menten estimation and inference for
-enzyme-kinetic data with concentration-dependent heteroscedasticity.
+enzyme-kinetic data with concentration-dependent heteroscedasticity. The
+package supports single-curve analyses, grouped workflows, and clustered
+repeated-measurement settings through Michaelis-Menten-specific score-based
+estimating routines and companion S3 summaries, plotting, and reporting tools.
 
 The package is designed around a compact workflow:
 
@@ -12,6 +15,12 @@ The package is designed around a compact workflow:
 - summarize and plot fitted objects with standard S3 methods plus `report_mm()`
 
 ## Installation
+
+```r
+install.packages("inferMM")
+```
+
+To install the current development version from GitHub:
 
 ```r
 # install.packages("remotes")
@@ -113,3 +122,5 @@ predict(fit, newdata = seq(0, 80, length.out = 6), interval = "prediction")
 - `vignettes/`: end-to-end workflow vignette
 - `tests/`: unit tests
 
+For manuscript-oriented simulation code, real-data scripts, and saved paper
+outputs, see the separate repository `inferMM-enzyme-repro`.
