@@ -113,5 +113,3 @@ predict(fit, newdata = seq(0, 80, length.out = 6), interval = "prediction")
 - `vignettes/`: end-to-end workflow vignette
 - `tests/`: unit tests
 
-For manuscript-oriented simulation code and saved paper outputs, see the
-separate repository `inferMM-cils-repro`.
