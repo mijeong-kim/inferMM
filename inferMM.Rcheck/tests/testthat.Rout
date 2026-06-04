@@ -1,0 +1,62 @@
+
+R version 4.6.0 (2026-04-24) -- "Because it was There"
+Copyright (C) 2026 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin23
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> if (!requireNamespace("testthat", quietly = TRUE)) {
++   quit(save = "no", status = 0)
++ }
+> 
+> library(testthat)
+> library(inferMM)
+> 
+> test_check("inferMM")
+Call:
+fit_mm(x = sim_dat$x, y = sim_dat$y, variance = "sqrt")
+
+Method: profile-score 
+Working variance: Var = gamma S^(1/2) 
+
+CI method: wald
+
+     Estimate Std. Error Lower CI  Upper CI
+Vmax 99.84090    1.20602 97.47715 102.20465
+Km   20.63602    0.73469 19.19607  22.07598
+
+Scale:0.72776  RMSE:2.16717  Weighted RSS:50
+Quasi-AIC:222.5454  Quasi-BIC:228.2815
+Call:
+cluster_mm(data = sim_dat, s = "substrate_conc", v = "activity", 
+    cluster = "cluster", variance = "sqrt")
+
+Method: clustered-profile-score 
+Clusters: 10 
+Initialization: pooled single-curve profile-score fit 
+Converged: yes   Iterations: 2 
+Residual working variance: Var = gamma S^(1/2) 
+
+CI method: wald
+
+       Estimate Std. Error  Lower CI   Upper CI
+Vmax 1421.24971   43.97731 1335.0558 1507.44365
+Km     34.80264    0.20681   34.3973   35.20799
+
+Tau^2:19252.72  Gamma:35.3107  RMSE:101.7479
+Quasi-AIC:3303.914  Quasi-BIC:3318.453
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 70 ]
+> 
+> proc.time()
+   user  system elapsed 
+  3.045   0.250   3.371 

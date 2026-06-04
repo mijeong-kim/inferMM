@@ -1,0 +1,12 @@
+alves_demo              Subset of the Alves Soil Enzyme Kinetics Data
+cluster_mm              Fit a Cluster-Aware Michaelis-Menten Model
+fit_mm                  Fit a Variance-Aware Michaelis-Menten Model
+group_mm                Fit Multiple Michaelis-Menten Curves by Group
+inferMM-package         inferMM: Variance-Aware Michaelis-Menten
+                        Estimation and Inference
+report_mm               Print and Plot a Michaelis-Menten Fit
+screen_mm               Screen Working Variance Models
+sdl_demo                Self-Driving Laboratory Michaelis-Menten Demo
+                        Data
+simulate_mm_data        Simulate Michaelis-Menten Data
+variance_function       Create Working Variance Functions

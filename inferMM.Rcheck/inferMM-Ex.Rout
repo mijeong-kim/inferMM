@@ -1,0 +1,756 @@
+
+R version 4.6.0 (2026-04-24) -- "Because it was There"
+Copyright (C) 2026 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin23
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "inferMM"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> base::assign(".ExTimings", "inferMM-Ex.timings", pos = 'CheckExEnv')
+> base::cat("name\tuser\tsystem\telapsed\n", file=base::get(".ExTimings", pos = 'CheckExEnv'))
+> base::assign(".format_ptime",
++ function(x) {
++   if(!is.na(x[4L])) x[1L] <- x[1L] + x[4L]
++   if(!is.na(x[5L])) x[2L] <- x[2L] + x[5L]
++   options(OutDec = '.')
++   format(x[1L:3L], digits = 7L)
++ },
++ pos = 'CheckExEnv')
+> 
+> ### * </HEADER>
+> library('inferMM')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("alves_demo")
+> ### * alves_demo
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: alves_demo
+> ### Title: Subset of the Alves Soil Enzyme Kinetics Data
+> ### Aliases: alves_demo
+> 
+> ### ** Examples
+> 
+> head(alves_demo)
+   core depth enzyme temperature substrate_conc activity
+1 Core1 00-10     AP          10            700 3589.864
+2 Core1 00-10     AP          10            700 3317.064
+3 Core1 00-10     AP          10            700 3634.273
+4 Core1 00-10     AP          10            700 2712.476
+5 Core1 00-10     AP          10            350 2927.495
+6 Core1 00-10     AP          10            350 4076.287
+> table(alves_demo$enzyme)
+
+ AP  BG LAP 
+ 79  79  89 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("alves_demo", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("cluster_mm")
+> ### * cluster_mm
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: cluster_mm
+> ### Title: Fit a Cluster-Aware Michaelis-Menten Model
+> ### Aliases: cluster_mm coef.cluster_mm confint.cluster_mm plot.cluster_mm
+> ###   predict.cluster_mm print.cluster_mm summary.cluster_mm
+> ###   print.summary.cluster_mm vcov.cluster_mm
+> 
+> ### ** Examples
+> 
+> cluster_fit <- cluster_mm(
++   data = subset(alves_demo, enzyme == "BG"),
++   s = "substrate_conc",
++   v = "activity",
++   cluster = "core",
++   variance = "sqrt"
++ )
+> 
+> coef(cluster_fit)
+      Vmax         Km 
+1435.43759   34.29102 
+> summary(cluster_fit)
+Call:
+cluster_mm(data = subset(alves_demo, enzyme == "BG"), s = "substrate_conc", 
+    v = "activity", cluster = "core", variance = "sqrt")
+
+Method: clustered-profile-score 
+Clusters: 3 
+Initialization: pooled single-curve profile-score fit 
+Converged: yes   Iterations: 4 
+Residual working variance: Var = gamma S^(1/2) 
+
+CI method: disabled by default for sparse clustered fits
+
+       Estimate
+Vmax 1435.43759
+Km     34.29102
+
+Interval inference is disabled by default for sparse clustered fits (3 clusters, 7 distinct substrate concentrations). Default interval reporting requires at least 4 clusters and at least 6 distinct concentrations.
+
+Tau^2:242368  Gamma:1303.433  RMSE:362.7108
+Quasi-AIC:1136.631  Quasi-BIC:1146.109
+> confint(cluster_fit)
+Warning: Small-cluster warning: this fit uses 3 clusters across 7 distinct substrate concentrations. Default interval reporting is disabled below 4 clusters or below 6 distinct concentrations because coverage may be unstable. Use these intervals only as a sensitivity analysis.
+         lower     upper
+Vmax 874.21368 1996.6615
+Km    29.34983   39.2322
+> head(
++   predict(
++     cluster_fit,
++     newdata = seq(0, 700, length.out = 6),
++     interval = "confidence"
++   )
++ )
+    x      fit   se.fit working_variance marginal_variance      lwr      upr
+1   0    0.000   0.0000     1.303433e-05      1.303433e-05   0.0000    0.000
+2 140 1153.021 228.8684     1.542243e+04      1.718025e+05 704.4475 1601.595
+3 280 1278.823 254.2365     2.181061e+04      2.141763e+05 780.5285 1777.117
+4 420 1327.087 264.0631     2.671244e+04      2.338723e+05 809.5330 1844.641
+5 560 1352.612 269.2834     3.084487e+04      2.460502e+05 824.8260 1880.398
+6 700 1368.403 272.5217     3.448561e+04      2.547453e+05 834.2708 1902.536
+> 
+> ## No test: 
+> plot(cluster_fit, interval_type = "confidence")
+> report_mm(cluster_fit, interval_type = "confidence")
+Call:
+cluster_mm(data = subset(alves_demo, enzyme == "BG"), s = "substrate_conc", 
+    v = "activity", cluster = "core", variance = "sqrt")
+
+Method: clustered-profile-score 
+Clusters: 3 
+Initialization: pooled single-curve profile-score fit 
+Converged: yes   Iterations: 4 
+Residual working variance: Var = gamma S^(1/2) 
+
+CI method: disabled by default for sparse clustered fits
+
+       Estimate
+Vmax 1435.43759
+Km     34.29102
+
+Interval inference is disabled by default for sparse clustered fits (3 clusters, 7 distinct substrate concentrations). Default interval reporting requires at least 4 clusters and at least 6 distinct concentrations.
+
+Tau^2:242368  Gamma:1303.433  RMSE:362.7108
+Quasi-AIC:1136.631  Quasi-BIC:1146.109
+> ## End(No test)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("cluster_mm", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("fit_mm")
+> ### * fit_mm
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: fit_mm
+> ### Title: Fit a Variance-Aware Michaelis-Menten Model
+> ### Aliases: fit_mm coef.fit_mm confint.fit_mm plot.fit_mm predict.fit_mm
+> ###   print.fit_mm summary.fit_mm print.summary.fit_mm vcov.fit_mm
+> 
+> ### ** Examples
+> 
+> one_curve <- subset(sdl_demo, enzyme == "1111")
+> 
+> fit <- fit_mm(
++   x = one_curve$s_uM,
++   y = one_curve$v_uM_per_min,
++   variance = "sqrt"
++ )
+> 
+> fit_power <- fit_mm(
++   x = one_curve$s_uM,
++   y = one_curve$v_uM_per_min,
++   variance = "power",
++   power = 0.4
++ )
+> 
+> fit_auto <- fit_mm(
++   x = one_curve$s_uM,
++   y = one_curve$v_uM_per_min,
++   variance = "auto",
++   power_selection = "quasi_aic"
++ )
+> 
+> coef(fit)
+    Vmax       Km 
+ 6.43188 76.42907 
+> confint(fit)
+         lower     upper
+Vmax  6.259256  6.604505
+Km   71.785829 81.072301
+> set.seed(1)
+> confint(
++   fit,
++   method = "bootstrap",
++   B = 99,
++   bootstrap_ci = "studentized",
++   wild_weights = "mammen"
++ )
+         lower    upper
+Vmax  6.224301  6.63876
+Km   71.079881 80.97992
+attr(,"bootstrap_draws")
+           Vmax       Km
+  [1,] 6.476014 79.83447
+  [2,] 6.378489 74.52054
+  [3,] 6.315636 73.40745
+  [4,] 6.606759 81.49450
+  [5,] 6.355270 72.46983
+  [6,] 6.490773 78.61711
+  [7,] 6.375798 76.89579
+  [8,] 6.415435 77.91821
+  [9,] 6.395333 75.79797
+ [10,] 6.452104 75.77422
+ [11,] 6.354902 73.64769
+ [12,] 6.253890 72.46448
+ [13,] 6.432755 76.48557
+ [14,] 6.239816 72.73521
+ [15,] 6.392421 72.35687
+ [16,] 6.438676 75.82950
+ [17,] 6.407854 76.57698
+ [18,] 6.418602 74.41747
+ [19,] 6.416149 78.11960
+ [20,] 6.398709 76.94679
+ [21,] 6.409231 78.06683
+ [22,] 6.414848 73.83375
+ [23,] 6.596570 80.87162
+ [24,] 6.445099 78.07890
+ [25,] 6.566444 78.84445
+ [26,] 6.316287 74.66422
+ [27,] 6.393557 76.88738
+ [28,] 6.458692 75.04789
+ [29,] 6.379901 76.13779
+ [30,] 6.257576 71.96651
+ [31,] 6.422571 75.72082
+ [32,] 6.464795 76.89847
+ [33,] 6.286777 73.34994
+ [34,] 6.471574 77.19526
+ [35,] 6.449847 76.42107
+ [36,] 6.371707 74.37569
+ [37,] 6.357429 74.21841
+ [38,] 6.357334 74.64551
+ [39,] 6.531732 77.41515
+ [40,] 6.372838 75.80516
+ [41,] 6.640540 81.91559
+ [42,] 6.427200 77.41146
+ [43,] 6.243263 73.29175
+ [44,] 6.580359 78.40103
+ [45,] 6.359400 73.67905
+ [46,] 6.546413 78.07210
+ [47,] 6.494002 77.34733
+ [48,] 6.368514 74.86933
+ [49,] 6.431841 75.52364
+ [50,] 6.451744 76.90597
+ [51,] 6.453025 77.24754
+ [52,] 6.484998 78.84887
+ [53,] 6.444248 76.11355
+ [54,] 6.416209 75.24676
+ [55,] 6.458626 76.53895
+ [56,] 6.304262 72.37091
+ [57,] 6.390457 75.06245
+ [58,] 6.369015 75.27856
+ [59,] 6.411905 76.62328
+ [60,] 6.335236 72.76626
+ [61,] 6.449384 76.19105
+ [62,] 6.350371 74.00297
+ [63,] 6.389128 75.40213
+ [64,] 6.509621 78.61138
+ [65,] 6.498540 77.34006
+ [66,] 6.297257 74.08351
+ [67,] 6.304905 73.09759
+ [68,] 6.650319 82.14755
+ [69,] 6.259182 72.65697
+ [70,] 6.620325 80.46960
+ [71,] 6.444258 77.05716
+ [72,] 6.618748 80.11028
+ [73,] 6.430931 77.26469
+ [74,] 6.651050 82.28822
+ [75,] 6.398579 76.10857
+ [76,] 6.531708 76.63966
+ [77,] 6.470498 76.55241
+ [78,] 6.501117 78.43636
+ [79,] 6.485008 77.65040
+ [80,] 6.485931 77.24606
+ [81,] 6.415493 75.51380
+ [82,] 6.443932 74.05108
+ [83,] 6.325003 73.76095
+ [84,] 6.323352 74.28236
+ [85,] 6.537225 78.46154
+ [86,] 6.425373 77.41009
+ [87,] 6.631429 81.96381
+ [88,] 6.380613 75.35240
+ [89,] 6.483115 77.88982
+ [90,] 6.338270 74.75712
+ [91,] 6.560837 76.39026
+ [92,] 6.553474 80.97582
+ [93,] 6.393651 74.96486
+ [94,] 6.500069 77.84719
+ [95,] 6.469865 77.91693
+ [96,] 6.341839 75.80376
+ [97,] 6.459499 78.36327
+ [98,] 6.358715 73.68685
+ [99,] 6.322227 72.95035
+attr(,"bootstrap_draws")attr(,"requested_B")
+[1] 99
+attr(,"bootstrap_draws")attr(,"successful_B")
+[1] 99
+attr(,"bootstrap_draws")attr(,"bootstrap_type")
+[1] "wild"
+attr(,"bootstrap_draws")attr(,"wild_weights")
+[1] "mammen"
+attr(,"bootstrap_draws")attr(,"se_draws")
+             Vmax       Km
+  [1,] 0.06985208 1.935124
+  [2,] 0.10246839 2.721211
+  [3,] 0.06735485 1.783951
+  [4,] 0.08946312 2.471365
+  [5,] 0.08391186 2.185031
+  [6,] 0.08787750 2.398055
+  [7,] 0.08215916 2.240689
+  [8,] 0.08112749 2.223237
+  [9,] 0.06964822 1.871104
+ [10,] 0.06270605 1.669348
+ [11,] 0.09723531 2.566446
+ [12,] 0.07315613 1.935708
+ [13,] 0.06387095 1.718819
+ [14,] 0.06907691 1.837610
+ [15,] 0.08942662 2.312088
+ [16,] 0.06834826 1.824457
+ [17,] 0.06262306 1.693470
+ [18,] 0.09244142 2.436773
+ [19,] 0.09928960 2.726513
+ [20,] 0.07677103 2.087400
+ [21,] 0.07698530 2.115122
+ [22,] 0.09008626 2.360508
+ [23,] 0.08547042 2.349661
+ [24,] 0.07809181 2.133862
+ [25,] 0.07836180 2.118843
+ [26,] 0.07504769 2.015870
+ [27,] 0.06357009 1.728746
+ [28,] 0.11550177 3.047138
+ [29,] 0.07788269 2.105225
+ [30,] 0.09938417 2.613052
+ [31,] 0.05738243 1.533743
+ [32,] 0.08069294 2.170478
+ [33,] 0.06924554 1.841238
+ [34,] 0.12740395 3.434337
+ [35,] 0.07649214 2.051568
+ [36,] 0.06966066 1.848912
+ [37,] 0.07615177 2.022158
+ [38,] 0.06883002 1.836538
+ [39,] 0.11082711 2.967009
+ [40,] 0.06943604 1.872134
+ [41,] 0.08286175 2.287154
+ [42,] 0.06895697 1.876023
+ [43,] 0.08397688 2.247013
+ [44,] 0.11008318 2.956345
+ [45,] 0.10509946 2.773038
+ [46,] 0.11417859 3.071443
+ [47,] 0.06588085 1.772678
+ [48,] 0.07496306 2.001667
+ [49,] 0.05970155 1.589968
+ [50,] 0.10320772 2.781921
+ [51,] 0.06368762 1.722687
+ [52,] 0.06434465 1.761755
+ [53,] 0.06786972 1.815773
+ [54,] 0.10341771 2.752472
+ [55,] 0.07591162 2.035847
+ [56,] 0.10580533 2.774245
+ [57,] 0.08402381 2.240719
+ [58,] 0.07026170 1.884538
+ [59,] 0.08045964 2.175535
+ [60,] 0.09580167 2.511072
+ [61,] 0.09470489 2.533849
+ [62,] 0.10681429 2.832647
+ [63,] 0.06495163 1.739009
+ [64,] 0.08706395 2.368834
+ [65,] 0.09176504 2.467235
+ [66,] 0.08347602 2.234426
+ [67,] 0.10286184 2.719394
+ [68,] 0.09143797 2.526102
+ [69,] 0.06791179 1.799408
+ [70,] 0.08130941 2.218032
+ [71,] 0.06825023 1.844812
+ [72,] 0.11440296 3.109920
+ [73,] 0.06073428 1.648749
+ [74,] 0.07796900 2.156834
+ [75,] 0.07508047 2.022909
+ [76,] 0.10677764 2.834709
+ [77,] 0.09604369 2.571415
+ [78,] 0.08721350 2.371596
+ [79,] 0.06570885 1.776283
+ [80,] 0.05785708 1.557014
+ [81,] 0.06421274 1.714279
+ [82,] 0.09237578 2.415500
+ [83,] 0.07133711 1.894212
+ [84,] 0.09829563 2.626123
+ [85,] 0.09614009 2.600597
+ [86,] 0.06440193 1.752572
+ [87,] 0.09357089 2.587562
+ [88,] 0.07474818 2.002868
+ [89,] 0.06268655 1.699433
+ [90,] 0.10975734 2.941041
+ [91,] 0.10045591 2.647836
+ [92,] 0.07292105 2.020010
+ [93,] 0.09533099 2.538228
+ [94,] 0.05871973 1.587018
+ [95,] 0.06068649 1.649058
+ [96,] 0.07445737 2.017298
+ [97,] 0.07664515 2.096006
+ [98,] 0.09689460 2.557056
+ [99,] 0.09746000 2.565203
+attr(,"bootstrap_draws")attr(,"bootstrap_ci")
+[1] "studentized"
+> head(predict(fit, newdata = seq(0, 80, length.out = 6), interval = "prediction"))
+   x      fit     se.fit working_variance           lwr          upr
+1  0 0.000000 0.00000000     1.203550e-11 -6.799549e-06 6.799549e-06
+2 16 1.113395 0.01709891     4.814198e-03  9.733357e-01 1.253455e+00
+3 32 1.898201 0.02294258     6.808304e-03  1.730345e+00 2.066058e+00
+4 48 2.481175 0.02455237     8.338436e-03  2.295844e+00 2.666505e+00
+5 64 2.931304 0.02479206     9.628397e-03  2.732941e+00 3.129668e+00
+6 80 3.289353 0.02489137     1.076487e-02  3.080229e+00 3.498477e+00
+> 
+> ## No test: 
+> plot(fit)
+> report_mm(fit, interval_type = "confidence")
+Call:
+fit_mm(x = one_curve$s_uM, y = one_curve$v_uM_per_min, variance = "sqrt")
+
+Method: profile-score 
+Working variance: Var = gamma S^(1/2) 
+
+CI method: wald
+
+     Estimate Std. Error Lower CI Upper CI
+Vmax  6.43188    0.08808  6.25926   6.6045
+Km   76.42907    2.36904 71.78583  81.0723
+
+Scale:0.0012  RMSE:0.11978  Weighted RSS:28
+Quasi-AIC:-44.87655  Quasi-BIC:-40.87994
+> ## End(No test)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("fit_mm", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("group_mm")
+> ### * group_mm
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: group_mm
+> ### Title: Fit Multiple Michaelis-Menten Curves by Group
+> ### Aliases: group_mm plot.group_mm print.group_mm
+> 
+> ### ** Examples
+> 
+> grouped <- group_mm(
++   data = sdl_demo,
++   s = "s_uM",
++   v = "v_uM_per_min",
++   groups = "enzyme",
++   variance_models = c("constant", "sqrt"),
++   power_values = 0.4,
++   include_auto = TRUE,
++   quiet = TRUE
++ )
+> 
+> grouped
+Call:
+group_mm(data = sdl_demo, s = "s_uM", v = "v_uM_per_min", groups = "enzyme", 
+    variance_models = c("constant", "sqrt"), power_values = 0.4, 
+    include_auto = TRUE, quiet = TRUE)
+
+Grouped Michaelis-Menten analysis for 6 group(s).
+
+Best model by group (ordered by quasi-AIC):
+ group_id group_label           model selected_model  quasi_aic  quasi_bic
+     1111 enzyme=1111 auto(quasi_aic)    power(0.85)  -46.89897  -42.90235
+     2222 enzyme=2222 auto(quasi_aic)       power(1) -106.50725 -102.51063
+     3333 enzyme=3333 auto(quasi_aic)       power(1)  -96.64475  -92.64814
+     4444 enzyme=4444 auto(quasi_aic)       power(1) -100.28551  -96.28890
+     5555 enzyme=5555 auto(quasi_aic)       power(1)  -73.10378  -69.10717
+     6666 enzyme=6666 auto(quasi_aic)       power(1)  -41.49399  -37.49737
+    rmse
+ 0.12129
+ 0.06073
+ 0.08059
+ 0.06026
+ 0.09233
+ 0.15304
+> head(
++   grouped$comparison$best_by_group[
++     ,
++     c("group_label", "model", "selected_model", "quasi_aic", "quasi_bic", "rmse")
++   ]
++ )
+  group_label           model selected_model  quasi_aic  quasi_bic       rmse
+1 enzyme=1111 auto(quasi_aic)    power(0.85)  -46.89897  -42.90235 0.12128898
+2 enzyme=2222 auto(quasi_aic)       power(1) -106.50725 -102.51063 0.06072664
+3 enzyme=3333 auto(quasi_aic)       power(1)  -96.64475  -92.64814 0.08058515
+4 enzyme=4444 auto(quasi_aic)       power(1) -100.28551  -96.28890 0.06026349
+5 enzyme=5555 auto(quasi_aic)       power(1)  -73.10378  -69.10717 0.09232693
+6 enzyme=6666 auto(quasi_aic)       power(1)  -41.49399  -37.49737 0.15304469
+> 
+> plot(grouped, interval_type = "confidence")
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("group_mm", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("report_mm")
+> ### * report_mm
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: report_mm
+> ### Title: Print and Plot a Michaelis-Menten Fit
+> ### Aliases: report_mm
+> 
+> ### ** Examples
+> 
+> one_curve <- subset(sdl_demo, enzyme == "1111")
+> fit <- fit_mm(
++   x = one_curve$s_uM,
++   y = one_curve$v_uM_per_min,
++   variance = "sqrt"
++ )
+> 
+> ## No test: 
+> report_mm(fit, interval_type = "confidence")
+Call:
+fit_mm(x = one_curve$s_uM, y = one_curve$v_uM_per_min, variance = "sqrt")
+
+Method: profile-score 
+Working variance: Var = gamma S^(1/2) 
+
+CI method: wald
+
+     Estimate Std. Error Lower CI Upper CI
+Vmax  6.43188    0.08808  6.25926   6.6045
+Km   76.42907    2.36904 71.78583  81.0723
+
+Scale:0.0012  RMSE:0.11978  Weighted RSS:28
+Quasi-AIC:-44.87655  Quasi-BIC:-40.87994
+> set.seed(1)
+> report_mm(
++   fit,
++   method = "bootstrap",
++   B = 99,
++   bootstrap_ci = "studentized",
++   wild_weights = "mammen",
++   interval_type = "confidence"
++ )
+Call:
+fit_mm(x = one_curve$s_uM, y = one_curve$v_uM_per_min, variance = "sqrt")
+
+Method: profile-score 
+Working variance: Var = gamma S^(1/2) 
+
+CI method: bootstrap (wild, mammen weights, studentized, B = 99)
+
+     Estimate Std. Error Lower CI Upper CI
+Vmax  6.43188    0.09470  6.22430  6.63876
+Km   76.42907    2.43358 71.07988 80.97992
+
+Scale:0.0012  RMSE:0.11978  Weighted RSS:28
+Quasi-AIC:-44.87655  Quasi-BIC:-40.87994
+> 
+> cluster_fit <- cluster_mm(
++   data = subset(alves_demo, enzyme == "BG"),
++   s = "substrate_conc",
++   v = "activity",
++   cluster = "core",
++   variance = "sqrt"
++ )
+> report_mm(cluster_fit, interval_type = "confidence")
+Call:
+cluster_mm(data = subset(alves_demo, enzyme == "BG"), s = "substrate_conc", 
+    v = "activity", cluster = "core", variance = "sqrt")
+
+Method: clustered-profile-score 
+Clusters: 3 
+Initialization: pooled single-curve profile-score fit 
+Converged: yes   Iterations: 4 
+Residual working variance: Var = gamma S^(1/2) 
+
+CI method: disabled by default for sparse clustered fits
+
+       Estimate
+Vmax 1435.43759
+Km     34.29102
+
+Interval inference is disabled by default for sparse clustered fits (3 clusters, 7 distinct substrate concentrations). Default interval reporting requires at least 4 clusters and at least 6 distinct concentrations.
+
+Tau^2:242368  Gamma:1303.433  RMSE:362.7108
+Quasi-AIC:1136.631  Quasi-BIC:1146.109
+> ## End(No test)
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("report_mm", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("screen_mm")
+> ### * screen_mm
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: screen_mm
+> ### Title: Screen Working Variance Models
+> ### Aliases: screen_mm print.screen_mm
+> 
+> ### ** Examples
+> 
+> one_curve <- subset(sdl_demo, enzyme == "1111")
+> screen <- screen_mm(
++   x = one_curve$s_uM,
++   y = one_curve$v_uM_per_min,
++   power_values = c(0.4, 0.6),
++   include_auto = TRUE,
++   quiet = TRUE
++ )
+> 
+> screen$table[, c("model", "selected_model", "quasi_aic", "quasi_bic", "rmse")]
+            model selected_model quasi_aic quasi_bic      rmse
+1 auto(quasi_aic)    power(0.85) -46.89897 -42.90235 0.1212890
+2      power(0.6)     power(0.6) -45.92753 -41.93092 0.1199642
+3            sqrt           sqrt -44.87655 -40.87994 0.1197806
+4      power(0.4)     power(0.4) -43.41216 -39.41554 0.1196889
+5        cuberoot       cuberoot -42.20181 -38.20520 0.1196584
+6             log            log -40.20657 -36.20995 0.1196680
+7        constant       constant -33.44685 -29.45023 0.1196306
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("screen_mm", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("sdl_demo")
+> ### * sdl_demo
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: sdl_demo
+> ### Title: Self-Driving Laboratory Michaelis-Menten Demo Data
+> ### Aliases: sdl_demo
+> 
+> ### ** Examples
+> 
+> head(sdl_demo)
+  enzyme    s_uM replicate  v_uM_per_s v_uM_per_min
+1   1111  7.8125         1 0.009597562    0.5758537
+2   1111  7.8125         2 0.008951894    0.5371136
+3   1111  7.8125         3 0.009135756    0.5481453
+4   1111  7.8125         4 0.009099076    0.5459446
+5   1111 15.6250         1 0.017878037    1.0726822
+6   1111 15.6250         2 0.017636455    1.0581873
+> table(sdl_demo$enzyme)
+
+1111 2222 3333 4444 5555 6666 
+  28   28   28   28   28   28 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("sdl_demo", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("simulate_mm_data")
+> ### * simulate_mm_data
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: simulate_mm_data
+> ### Title: Simulate Michaelis-Menten Data
+> ### Aliases: simulate_mm_data
+> 
+> ### ** Examples
+> 
+> set.seed(1)
+> sim_dat <- simulate_mm_data(variance_shape = "hill", error = "skewed")
+> head(sim_dat)
+  x         y true_mean true_variance      error
+1 1  3.966184  4.761905      1.022444 -0.7869383
+2 2 10.358845  9.090909      1.089109  1.2149591
+3 3 14.294150 13.043478      1.198044  1.1426332
+4 4 16.851554 16.666667      1.346154  0.1593525
+5 5 21.365820 20.000000      1.529412  1.1044123
+6 6 23.748651 23.076923      1.743119  0.5087799
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("simulate_mm_data", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("variance_function")
+> ### * variance_function
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: variance_function
+> ### Title: Create Working Variance Functions
+> ### Aliases: variance_function
+> 
+> ### ** Examples
+> 
+> h_log <- variance_function("log")
+> h_sqrt <- variance_function("sqrt")
+> h_log(c(0, 5, 10))
+[1] 0.000000 1.791759 2.397895
+> h_sqrt(c(0, 5, 10))
+[1] 0.000000 2.236068 3.162278
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("variance_function", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> ### * <FOOTER>
+> ###
+> cleanEx()
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  2.078 0.113 2.196 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')
