@@ -4,6 +4,10 @@ safe_pos <- function(x, lower = 1e-8, upper = 1e10) {
   pmin(pmax(x, lower), upper)
 }
 
+ignore_seed_argument <- function(seed) {
+  invisible(seed)
+}
+
 safe_inverse <- function(mat, ridge = 1e-8, max_tries = 8L) {
   p <- nrow(mat)
   eye <- diag(p)
@@ -163,9 +167,7 @@ bootstrap_fit_mm <- function(object,
     stop("B must be a single integer of at least 20.")
   }
 
-  if (!is.null(seed)) {
-    set.seed(as.integer(seed))
-  }
+  ignore_seed_argument(seed)
 
   beta_names <- names(coef(object))
   draws <- matrix(NA_real_, nrow = B, ncol = length(beta_names))
@@ -240,9 +242,7 @@ bootstrap_fit_cluster_mm <- function(object,
     stop("B must be a single integer of at least 20.")
   }
 
-  if (!is.null(seed)) {
-    set.seed(as.integer(seed))
-  }
+  ignore_seed_argument(seed)
 
   beta_names <- names(coef(object))
   draws <- matrix(NA_real_, nrow = B, ncol = length(beta_names))

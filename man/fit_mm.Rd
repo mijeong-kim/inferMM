@@ -79,7 +79,8 @@ fit_mm(x, y,
   \item{wild_weights}{Wild-bootstrap multipliers used when
   \code{bootstrap_type = "wild"}: \code{"mammen"} or
   \code{"rademacher"}.}
-  \item{seed}{Optional bootstrap seed.}
+  \item{seed}{Deprecated and ignored. Call \code{stats::set.seed()} before
+  bootstrap-based summaries or intervals if reproducibility is needed.}
   \item{digits}{Number of printed digits.}
   \item{newdata}{Optional numeric vector of new substrate concentrations.}
   \item{se.fit}{Logical; if \code{TRUE}, return standard errors for mean
@@ -104,18 +105,16 @@ concentration-dependent working variance specification.
 \details{
 Built-in working variance models are \code{"constant"}, \code{"log"},
 \code{"sqrt"}, \code{"cuberoot"}, \code{"power"}, and \code{"auto"}.
-The constant-variance case uses
-nonlinear least squares, while the heteroscedastic cases use the profile-score
-estimator from the companion methodology work. Confidence intervals can be
+All built-in single-curve fits use the Michaelis-Menten profile-score
+estimator from the companion methodology work, with the constant-variance case
+treated as the special case \eqn{h(S) \equiv 1}. Confidence intervals can be
 computed either from the default asymptotic Wald approximation or from a
 bootstrap refitting scheme. The bootstrap option supports percentile, basic,
 and studentized calibration, together with wild or pairs resampling. The
 default printed summaries suppress interval output when the fitted curve has
 fewer than 20 observations or fewer than 6 distinct substrate concentrations;
 in that setting, \code{confint()} remains available as an explicit sensitivity
-analysis tool and issues a warning.
-The
-automatic option compares
+analysis tool and issues a warning. The automatic option compares
 \code{log(S + 1)} with a user-supplied grid of \eqn{S^p} working variance
 functions and keeps the best fit according to quasi-AIC or quasi-BIC.
 }
@@ -144,13 +143,13 @@ fit_auto <- fit_mm(
 
 coef(fit)
 confint(fit)
+set.seed(1)
 confint(
   fit,
   method = "bootstrap",
   B = 99,
   bootstrap_ci = "studentized",
-  wild_weights = "mammen",
-  seed = 1
+  wild_weights = "mammen"
 )
 head(predict(fit, newdata = seq(0, 80, length.out = 6), interval = "prediction"))
 

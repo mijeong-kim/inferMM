@@ -79,7 +79,12 @@ grouped <- group_mm(
 )
 
 grouped
-head(grouped$comparison$best_by_group[, c("group_label", "model", "selected_model", "quasi_aic", "quasi_bic", "rmse")])
+head(
+  grouped$comparison$best_by_group[
+    ,
+    c("group_label", "model", "selected_model", "quasi_aic", "quasi_bic", "rmse")
+  ]
+)
 
 plot(grouped, interval_type = "confidence")
 }

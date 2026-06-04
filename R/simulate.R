@@ -34,7 +34,8 @@ draw_standardized_error <- function(n, error = c("normal", "skewed"), skew_shape
 #' @param error Character string naming the error distribution.
 #' @param s0,t2,c,a,alpha Variance-shape parameters.
 #' @param skew_shape Shape parameter for the skewed gamma-based error.
-#' @param seed Optional random seed.
+#' @param seed Deprecated and ignored. Call [stats::set.seed()] before
+#'   `simulate_mm_data()` if reproducibility is needed.
 #'
 #' @return A data frame containing the simulated observations.
 #' @export
@@ -54,20 +55,7 @@ simulate_mm_data <- function(n = 100,
   variance_shape <- match.arg(variance_shape)
   error <- match.arg(error)
 
-  if (!is.null(seed)) {
-    had_seed <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
-    if (had_seed) {
-      old_seed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
-    }
-    on.exit({
-      if (exists("old_seed", inherits = FALSE)) {
-        .Random.seed <<- old_seed
-      } else if (!had_seed && exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) {
-        rm(".Random.seed", envir = .GlobalEnv)
-      }
-    }, add = TRUE)
-    set.seed(seed)
-  }
+  ignore_seed_argument(seed)
 
   x <- as.numeric(x)
   variance_fun <- switch(

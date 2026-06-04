@@ -14,7 +14,8 @@
 #'   `method = "bootstrap"`: `"studentized"`, `"basic"`, or `"percentile"`.
 #' @param wild_weights Wild-bootstrap multipliers used when
 #'   `bootstrap_type = "wild"`: `"mammen"` or `"rademacher"`.
-#' @param seed Optional bootstrap seed passed to the printed summary.
+#' @param seed Deprecated and ignored. Call [stats::set.seed()] before
+#'   `report_mm()` when reproducible bootstrap output is needed.
 #' @param interval_type Character string indicating whether the plotted band
 #'   should be `"confidence"`, `"prediction"`, or `"none"`.
 #' @param digits Number of printed digits.

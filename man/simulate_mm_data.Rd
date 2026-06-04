@@ -16,7 +16,8 @@ simulate_mm_data(n = 100, x = seq(1, 100, length.out = n),
   \item{error}{Character string naming the error distribution.}
   \item{s0,t2,c,a,alpha}{Variance-shape parameters.}
   \item{skew_shape}{Shape parameter for the skewed gamma-based error.}
-  \item{seed}{Optional random seed.}
+  \item{seed}{Deprecated and ignored. Call \code{stats::set.seed()} before
+  \code{simulate_mm_data()} if reproducibility is needed.}
 }
 \value{
 A data frame containing the simulated observations.
@@ -26,6 +27,7 @@ Generate a synthetic Michaelis-Menten dataset with bounded heteroscedastic
 variance and either Gaussian or moderately skewed errors.
 }
 \examples{
-sim_dat <- simulate_mm_data(seed = 1, variance_shape = "hill", error = "skewed")
+set.seed(1)
+sim_dat <- simulate_mm_data(variance_shape = "hill", error = "skewed")
 head(sim_dat)
 }

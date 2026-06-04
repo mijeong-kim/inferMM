@@ -274,6 +274,8 @@ plot.fit_mm <- function(x,
                              col.line = "#222222",
                              col.band = grDevices::adjustcolor("#9ecae1", alpha.f = 0.45),
                              ...) {
+  dots <- list(...)
+  dots[c("x", "y", "xlab", "ylab", "main", "pch", "col")] <- NULL
   interval_type <- match.arg(interval_type)
   x_seq <- seq(min(x$x), max(x$x), length.out = n_points)
   pred <- if (isTRUE(interval)) {
@@ -293,15 +295,40 @@ plot.fit_mm <- function(x,
     )
   }
 
-  graphics::plot(
-    x$x,
-    x$y,
-    xlab = xlab,
-    ylab = ylab,
-    main = if (is.null(main)) x$variance_label else main,
-    pch = pch,
-    col = col.points,
-    ...
+  fit_values <- if (isTRUE(interval)) pred$fit else pred
+  x_range <- range(c(x$x, x_seq), finite = TRUE)
+  y_range <- if (isTRUE(interval)) {
+    range(c(x$y, pred$lwr, pred$upr), finite = TRUE)
+  } else {
+    range(c(x$y, fit_values), finite = TRUE)
+  }
+  y_span <- diff(y_range)
+  if (!is.finite(y_span) || y_span <= 0) {
+    y_span <- max(abs(y_range), 1)
+  }
+  y_pad <- 0.04 * y_span
+
+  if (is.null(dots$xlim)) {
+    dots$xlim <- x_range
+  }
+  if (is.null(dots$ylim)) {
+    dots$ylim <- c(y_range[1] - y_pad, y_range[2] + y_pad)
+  }
+
+  do.call(
+    graphics::plot,
+    c(
+      list(
+        x = x$x,
+        y = x$y,
+        xlab = xlab,
+        ylab = ylab,
+        main = if (is.null(main)) x$variance_label else main,
+        pch = pch,
+        col = col.points
+      ),
+      dots
+    )
   )
 
   if (isTRUE(interval)) {
@@ -314,7 +341,6 @@ plot.fit_mm <- function(x,
     graphics::points(x$x, x$y, pch = pch, col = col.points)
   }
 
-  fit_values <- if (isTRUE(interval)) pred$fit else pred
   graphics::lines(x_seq, fit_values, lwd = 2, col = col.line)
   invisible(x)
 }

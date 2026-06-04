@@ -1,13 +1,11 @@
 library(inferMM)
 
 simulate_mm_data <- function(n = 50L,
-                             seed = 1L,
                              variance_shape = c("mm", "exp", "hill"),
                              error = c("normal", "skewed")) {
   variance_shape <- match.arg(variance_shape)
   error <- match.arg(error)
 
-  set.seed(seed)
   x <- seq(1, 100, length.out = n)
   mu <- 100 * x / (20 + x)
 
@@ -31,11 +29,9 @@ simulate_mm_data <- function(n = 50L,
 
 simulate_clustered_mm_data <- function(n_clusters = 6L,
                                        reps = 4L,
-                                       seed = 1L,
                                        error = c("normal", "skewed")) {
   error <- match.arg(error)
 
-  set.seed(seed)
   x_levels <- c(10, 25, 50, 100, 200, 400, 700)
   cluster <- rep(seq_len(n_clusters), each = length(x_levels) * reps)
   x <- rep(rep(x_levels, each = reps), times = n_clusters)
@@ -57,7 +53,8 @@ simulate_clustered_mm_data <- function(n_clusters = 6L,
 }
 
 test_that("fit_mm fits a variance-aware model", {
-  sim_dat <- simulate_mm_data(seed = 1, variance_shape = "mm", error = "normal")
+  set.seed(1)
+  sim_dat <- simulate_mm_data(variance_shape = "mm", error = "normal")
   fit <- fit_mm(sim_dat$x, sim_dat$y, variance = "sqrt")
 
   expect_s3_class(fit, "fit_mm")
@@ -66,8 +63,20 @@ test_that("fit_mm fits a variance-aware model", {
   expect_equal(dim(confint(fit)), c(2, 2))
 })
 
+test_that("fit_mm uses the profile-score path for constant variance", {
+  set.seed(3)
+  sim_dat <- simulate_mm_data(variance_shape = "mm", error = "normal")
+  fit <- fit_mm(sim_dat$x, sim_dat$y, variance = "constant")
+
+  expect_s3_class(fit, "fit_mm")
+  expect_identical(fit$variance_model, "constant")
+  expect_identical(fit$method, "profile-score")
+  expect_true(all(is.finite(coef(fit))))
+})
+
 test_that("fit_mm supports fixed-power and automatic variance choices", {
-  sim_dat <- simulate_mm_data(seed = 5, variance_shape = "exp", error = "normal")
+  set.seed(5)
+  sim_dat <- simulate_mm_data(variance_shape = "exp", error = "normal")
 
   fit_power <- fit_mm(sim_dat$x, sim_dat$y, variance = "power", power = 0.4)
   expect_s3_class(fit_power, "fit_mm")
@@ -87,28 +96,29 @@ test_that("fit_mm supports fixed-power and automatic variance choices", {
 })
 
 test_that("bootstrap confidence intervals are available", {
-  sim_dat <- simulate_mm_data(seed = 7, variance_shape = "exp", error = "skewed")
+  set.seed(7)
+  sim_dat <- simulate_mm_data(variance_shape = "exp", error = "skewed")
   fit <- fit_mm(sim_dat$x, sim_dat$y, variance = "sqrt")
 
+  set.seed(1)
   ci_boot <- confint(
     fit,
     method = "bootstrap",
     B = 25,
     bootstrap_ci = "studentized",
-    wild_weights = "mammen",
-    seed = 1
+    wild_weights = "mammen"
   )
   expect_equal(dim(ci_boot), c(2, 2))
   expect_false(is.null(attr(ci_boot, "bootstrap_draws")))
   expect_identical(attr(attr(ci_boot, "bootstrap_draws"), "bootstrap_ci"), "studentized")
 
+  set.seed(1)
   summ_boot <- summary(
     fit,
     method = "bootstrap",
     B = 25,
     bootstrap_ci = "studentized",
-    wild_weights = "mammen",
-    seed = 1
+    wild_weights = "mammen"
   )
   expect_identical(summ_boot$ci_method, "bootstrap")
   expect_identical(summ_boot$bootstrap_ci, "studentized")
@@ -117,7 +127,8 @@ test_that("bootstrap confidence intervals are available", {
 })
 
 test_that("small-sample fits suppress default interval reporting", {
-  sim_dat <- simulate_mm_data(n = 10, seed = 13, variance_shape = "mm", error = "normal")
+  set.seed(13)
+  sim_dat <- simulate_mm_data(n = 10, variance_shape = "mm", error = "normal")
   fit <- fit_mm(sim_dat$x, sim_dat$y, variance = "sqrt")
 
   summ_small <- summary(fit)
@@ -136,7 +147,8 @@ test_that("small-sample fits suppress default interval reporting", {
 })
 
 test_that("report_mm prints and plots without error", {
-  sim_dat <- simulate_mm_data(seed = 11, variance_shape = "mm", error = "normal")
+  set.seed(11)
+  sim_dat <- simulate_mm_data(variance_shape = "mm", error = "normal")
   fit <- fit_mm(sim_dat$x, sim_dat$y, variance = "sqrt")
   tmp_plot <- tempfile(fileext = ".pdf")
   grDevices::pdf(tmp_plot)
@@ -145,27 +157,29 @@ test_that("report_mm prints and plots without error", {
   out <- report_mm(fit, interval_type = "confidence")
   expect_s3_class(out, "fit_mm")
 
-  txt_boot <- capture.output(
+  txt_boot <- capture.output({
+    set.seed(1)
     report_mm(
       fit,
       method = "bootstrap",
       B = 25,
       bootstrap_ci = "studentized",
       wild_weights = "mammen",
-      seed = 1,
       interval_type = "none"
     )
-  )
+  })
   expect_true(any(grepl("CI method: bootstrap", txt_boot, fixed = TRUE)))
 
-  sim_small <- simulate_mm_data(n = 10, seed = 17, variance_shape = "exp", error = "normal")
+  set.seed(17)
+  sim_small <- simulate_mm_data(n = 10, variance_shape = "exp", error = "normal")
   fit_small <- fit_mm(sim_small$x, sim_small$y, variance = "sqrt")
   txt_small <- capture.output(report_mm(fit_small, interval_type = "none"))
   expect_true(any(grepl("disabled by default for small samples", txt_small, fixed = TRUE)))
 })
 
 test_that("screen_mm returns a ranking table", {
-  sim_dat <- simulate_mm_data(seed = 2, variance_shape = "exp", error = "normal")
+  set.seed(2)
+  sim_dat <- simulate_mm_data(variance_shape = "exp", error = "normal")
   out <- screen_mm(
     sim_dat$x,
     sim_dat$y,
@@ -225,8 +239,29 @@ test_that("plot.group_mm draws grouped panels without error", {
   expect_s3_class(plotted, "group_mm")
 })
 
+test_that("plot.fit_mm expands limits to include interval bands", {
+  one_curve <- subset(sdl_demo, enzyme == "4444")
+  fit <- fit_mm(one_curve$s_uM, one_curve$v_uM_per_min, variance = "sqrt")
+  pred <- predict(
+    fit,
+    newdata = seq(min(one_curve$s_uM), max(one_curve$s_uM), length.out = 200),
+    interval = "prediction"
+  )
+
+  tmp_plot <- tempfile(fileext = ".pdf")
+  grDevices::pdf(tmp_plot)
+  on.exit(grDevices::dev.off(), add = TRUE)
+
+  plot(fit, interval_type = "prediction")
+  usr <- graphics::par("usr")
+
+  expect_lte(usr[3], min(pred$lwr) + 1e-8)
+  expect_gte(usr[4], max(pred$upr) - 1e-8)
+})
+
 test_that("cluster_mm fits repeated-measurement data and supports core methods", {
-  sim_dat <- simulate_clustered_mm_data(n_clusters = 10L, seed = 21, error = "normal")
+  set.seed(21)
+  sim_dat <- simulate_clustered_mm_data(n_clusters = 10L, error = "normal")
 
   fit <- cluster_mm(
     data = sim_dat,
@@ -239,6 +274,7 @@ test_that("cluster_mm fits repeated-measurement data and supports core methods",
   expect_s3_class(fit, "cluster_mm")
   expect_true(all(c("Vmax", "Km") %in% names(coef(fit))))
   expect_true(all(is.finite(coef(fit))))
+  expect_identical(fit$initialization_method, "pooled single-curve profile-score fit")
   expect_equal(dim(vcov(fit)), c(2, 2))
   expect_equal(dim(confint(fit)), c(2, 2))
 
@@ -271,18 +307,43 @@ test_that("cluster_mm fits repeated-measurement data and supports core methods",
   out <- report_mm(fit, interval_type = "confidence")
   expect_s3_class(out, "cluster_mm")
 
-  txt_boot <- capture.output(
+  txt_boot <- capture.output({
+    set.seed(1)
     report_mm(
       fit,
       method = "bootstrap",
       B = 25,
       bootstrap_type = "pairs",
       bootstrap_ci = "basic",
-      seed = 1,
       interval_type = "none"
     )
-  )
+  })
   expect_true(any(grepl("CI method: bootstrap \\(cluster pairs", txt_boot)))
+})
+
+test_that("plot.cluster_mm expands limits to include interval bands", {
+  fit <- cluster_mm(
+    data = subset(alves_demo, enzyme == "BG"),
+    s = "substrate_conc",
+    v = "activity",
+    cluster = "core",
+    variance = "sqrt"
+  )
+  pred <- predict(
+    fit,
+    newdata = seq(min(fit$x), max(fit$x), length.out = 200),
+    interval = "prediction"
+  )
+
+  tmp_plot <- tempfile(fileext = ".pdf")
+  grDevices::pdf(tmp_plot)
+  on.exit(grDevices::dev.off(), add = TRUE)
+
+  plot(fit, interval_type = "prediction")
+  usr <- graphics::par("usr")
+
+  expect_lte(usr[3], min(pred$lwr) + 1e-8)
+  expect_gte(usr[4], max(pred$upr) - 1e-8)
 })
 
 test_that("cluster_mm applies the sparse-cluster interval policy", {
@@ -306,14 +367,16 @@ test_that("cluster_mm applies the sparse-cluster interval policy", {
   expect_equal(dim(ci_small), c(2, 2))
 
   expect_warning(
-    ci_boot_small <- confint(
-      fit,
-      method = "bootstrap",
-      B = 25,
-      bootstrap_type = "pairs",
-      bootstrap_ci = "basic",
-      seed = 1
-    ),
+    {
+      set.seed(1)
+      ci_boot_small <- confint(
+        fit,
+        method = "bootstrap",
+        B = 25,
+        bootstrap_type = "pairs",
+        bootstrap_ci = "basic"
+      )
+    },
     "Experimental clustered bootstrap warning"
   )
   expect_equal(dim(ci_boot_small), c(2, 2))

@@ -155,36 +155,18 @@ fit_cluster_mm_weighted <- function(cleaned,
     ),
     error = function(e) e
   )
-  initialization_method <- "pooled variance-aware fit"
+  initialization_method <- "pooled single-curve profile-score fit"
   initialization_warning <- NULL
 
   if (inherits(pooled_start, "error")) {
-    pooled_error <- conditionMessage(pooled_start)
-    pooled_start <- tryCatch(
-      fit_mm_nls(
-        x = x_all,
-        y = y_all,
-        interval_level = interval_level,
-        allow_zero_substrate = allow_zero_substrate
-      ),
-      error = function(e) e
-    )
-    initialization_method <- "pooled homoscedastic NLS fallback"
-    initialization_warning <- paste(
-      "Variance-aware pooled initialization failed;",
-      "cluster_mm() fell back to a pooled homoscedastic NLS start.",
-      "Original error:",
-      pooled_error
-    )
-    if (inherits(pooled_start, "error")) {
-      stop(
-        "Unable to initialize cluster_mm(). ",
-        initialization_warning,
-        " Fallback NLS error: ",
+    stop(
+      paste(
+        "Unable to initialize cluster_mm() from the pooled single-curve",
+        "profile-score fit.",
         conditionMessage(pooled_start)
-      )
-    }
-    warning(initialization_warning, call. = FALSE)
+      ),
+      call. = FALSE
+    )
   }
 
   Vmax <- unname(coef(pooled_start)["Vmax"])
@@ -942,6 +924,8 @@ plot.cluster_mm <- function(x,
                             col.line = "#222222",
                             col.band = grDevices::adjustcolor("#9ecae1", alpha.f = 0.45),
                             ...) {
+  dots <- list(...)
+  dots[c("x", "y", "xlab", "ylab", "main", "pch", "col")] <- NULL
   interval_type <- match.arg(interval_type)
   x_seq <- seq(min(x$x), max(x$x), length.out = n_points)
   pred <- if (isTRUE(interval)) {
@@ -961,15 +945,40 @@ plot.cluster_mm <- function(x,
     )
   }
 
-  graphics::plot(
-    x$x,
-    x$y,
-    xlab = xlab,
-    ylab = ylab,
-    main = if (is.null(main)) paste("Clustered fit:", x$variance_label) else main,
-    pch = pch,
-    col = col.points,
-    ...
+  fit_values <- if (isTRUE(interval)) pred$fit else pred
+  x_range <- range(c(x$x, x_seq), finite = TRUE)
+  y_range <- if (isTRUE(interval)) {
+    range(c(x$y, pred$lwr, pred$upr), finite = TRUE)
+  } else {
+    range(c(x$y, fit_values), finite = TRUE)
+  }
+  y_span <- diff(y_range)
+  if (!is.finite(y_span) || y_span <= 0) {
+    y_span <- max(abs(y_range), 1)
+  }
+  y_pad <- 0.04 * y_span
+
+  if (is.null(dots$xlim)) {
+    dots$xlim <- x_range
+  }
+  if (is.null(dots$ylim)) {
+    dots$ylim <- c(y_range[1] - y_pad, y_range[2] + y_pad)
+  }
+
+  do.call(
+    graphics::plot,
+    c(
+      list(
+        x = x$x,
+        y = x$y,
+        xlab = xlab,
+        ylab = ylab,
+        main = if (is.null(main)) paste("Clustered fit:", x$variance_label) else main,
+        pch = pch,
+        col = col.points
+      ),
+      dots
+    )
   )
 
   if (isTRUE(interval)) {
@@ -982,7 +991,6 @@ plot.cluster_mm <- function(x,
     graphics::points(x$x, x$y, pch = pch, col = col.points)
   }
 
-  fit_values <- if (isTRUE(interval)) pred$fit else pred
   graphics::lines(x_seq, fit_values, lwd = 2, col = col.line)
   invisible(x)
 }

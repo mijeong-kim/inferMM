@@ -26,7 +26,8 @@ report_mm(object, level = object$interval_level,
   \item{wild_weights}{Wild-bootstrap multipliers used when
   \code{bootstrap_type = "wild"}: \code{"mammen"} or
   \code{"rademacher"}.}
-  \item{seed}{Optional bootstrap seed passed to the printed summary.}
+  \item{seed}{Deprecated and ignored. Call \code{stats::set.seed()} before
+  bootstrap-based summaries if reproducibility is needed.}
   \item{interval_type}{Character string indicating whether the plotted band
   should be \code{"confidence"}, \code{"prediction"}, or \code{"none"}.}
   \item{digits}{Number of printed digits.}
@@ -59,13 +60,13 @@ fit <- fit_mm(
 
 \donttest{
 report_mm(fit, interval_type = "confidence")
+set.seed(1)
 report_mm(
   fit,
   method = "bootstrap",
   B = 99,
   bootstrap_ci = "studentized",
   wild_weights = "mammen",
-  seed = 1,
   interval_type = "confidence"
 )
 

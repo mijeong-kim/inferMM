@@ -23,13 +23,19 @@ cluster_mm(data, s, v, cluster,
 \method{vcov}{cluster_mm}(object, ...)
 
 \method{confint}{cluster_mm}(object, parm = c("Vmax", "Km"),
-  level = object$interval_level, method = c("wald"), ...)
+  level = object$interval_level, method = c("wald", "bootstrap"),
+  B = 399L, bootstrap_type = c("pairs"),
+  bootstrap_ci = c("studentized", "basic", "percentile"),
+  seed = NULL, ...)
 
 \method{print}{cluster_mm}(x,
   digits = max(3L, getOption("digits") - 2L), ...)
 
 \method{summary}{cluster_mm}(object, level = object$interval_level,
-  method = c("wald"), ...)
+  method = c("wald", "bootstrap"), B = 399L,
+  bootstrap_type = c("pairs"),
+  bootstrap_ci = c("studentized", "basic", "percentile"),
+  seed = NULL, ...)
 
 \method{print}{summary.cluster_mm}(x,
   digits = max(3L, getOption("digits") - 2L), ...)
@@ -70,7 +76,16 @@ cluster_mm(data, s, v, cluster,
   \item{parm}{Parameter names for \code{confint()}.}
   \item{level}{Confidence level for intervals.}
   \item{method}{Interval construction method. The current implementation
-  supports \code{"wald"} only.}
+  supports \code{"wald"} or a cluster-pairs \code{"bootstrap"}
+  sensitivity analysis.}
+  \item{B}{Number of bootstrap resamples when
+  \code{method = "bootstrap"}.}
+  \item{bootstrap_type}{Bootstrap scheme for clustered fits. The current
+  implementation supports \code{"pairs"} only.}
+  \item{bootstrap_ci}{Bootstrap confidence-interval calibration:
+  \code{"studentized"}, \code{"basic"}, or \code{"percentile"}.}
+  \item{seed}{Deprecated and ignored. Call \code{stats::set.seed()} before
+  bootstrap-based summaries or intervals if reproducibility is needed.}
   \item{x}{A fitted \code{"cluster_mm"} object for the print and plot methods.}
   \item{digits}{Number of printed digits.}
   \item{newdata}{Optional numeric vector of new substrate concentrations.}
@@ -107,11 +122,11 @@ effects specification.
 Numerically, the routine initializes the clustered fit from the corresponding
 pooled single-curve estimator and then alternates a one-dimensional update for
 \eqn{K_m} with plug-in updates for \eqn{V_{\max}} and moment-based updates for
-the variance components. If the variance-aware pooled start fails, the code
-falls back to a pooled homoscedastic NLS start and records that choice in the
-returned object. Fits that reach the maximum number of outer iterations without
-meeting the convergence tolerance remain available but carry an explicit
-convergence warning in the object summary.
+the variance components. The pooled start is obtained from the same
+single-curve profile-score machinery used by \code{fit_mm()}, including the
+constant-variance special case. Fits that reach the maximum number of outer
+iterations without meeting the convergence tolerance remain available but
+carry an explicit convergence warning in the object summary.
 
 Because small numbers of clusters can make first-order interval calibration
 fragile, printed summaries suppress interval output by default when fewer than
