@@ -58,12 +58,40 @@ confint.fit_mm <- function(object,
   out
 }
 
+print_fit_mm_screening <- function(x, digits) {
+  if (!identical(x$variance_selection_mode, "screen")) {
+    return(invisible(NULL))
+  }
+
+  table <- x$screen_table
+  if (!is.data.frame(table)) table <- x$variance_candidate_table
+  keep <- c("model", "quasi_aic", "quasi_bic", "selected", "success")
+  if (any(table$success != 1L)) keep <- c(keep, "error_message")
+  show <- table[, keep, drop = FALSE]
+  show$quasi_aic <- round(show$quasi_aic, digits = digits)
+  show$quasi_bic <- round(show$quasi_bic, digits = digits)
+
+  cat("Variance-model screening:\n\n")
+  print(show, row.names = FALSE)
+  cat("\nSelected model:", x$variance_model,
+      "(minimum", paste0(selection_label(x$variance_selection), ")"), "\n\n")
+  invisible(NULL)
+}
+
+print_fit_mm_selection_note <- function(x) {
+  if (identical(x$variance_selection_mode, "screen")) {
+    cat("\nIntervals condition on the selected variance model; model-selection uncertainty is not included.\n")
+  }
+  invisible(NULL)
+}
+
 #' @export
 print.fit_mm <- function(x, digits = max(3L, getOption("digits") - 2L), ...) {
   cat("Call:\n")
   print(x$call)
   cat("\nMethod:", x$method, "\n")
   cat("Working variance:", x$variance_label, "\n\n")
+  print_fit_mm_screening(x, digits = digits)
   policy <- small_sample_ci_policy(x)
 
   coef_table <- if (isTRUE(policy$disable)) {
@@ -88,6 +116,8 @@ print.fit_mm <- function(x, digits = max(3L, getOption("digits") - 2L), ...) {
     "  RMSE:", round(x$rmse, digits), "\n",
     sep = ""
   )
+
+  if (!isTRUE(policy$disable)) print_fit_mm_selection_note(x)
 
   invisible(x)
 }
@@ -143,6 +173,12 @@ summary.fit_mm <- function(object,
     bootstrap_B = if (!isTRUE(policy$disable) && identical(method, "bootstrap")) B else NULL,
     small_sample_policy = policy
   )
+  if (identical(object$variance_selection_mode, "screen")) {
+    out$variance_selection_mode <- object$variance_selection_mode
+    out$variance_selection <- object$variance_selection
+    out$screen_table <- object$screen_table
+    out$variance_candidate_table <- object$variance_candidate_table
+  }
   class(out) <- "summary.fit_mm"
   out
 }
@@ -153,6 +189,7 @@ print.summary.fit_mm <- function(x, digits = max(3L, getOption("digits") - 2L), 
   print(x$call)
   cat("\nMethod:", x$method, "\n")
   cat("Working variance:", x$variance_label, "\n\n")
+  print_fit_mm_screening(x, digits = digits)
   if (identical(x$ci_method, "disabled")) {
     cat("CI method: disabled by default for small samples\n\n")
   } else if (identical(x$ci_method, "bootstrap")) {
@@ -205,6 +242,8 @@ print.summary.fit_mm <- function(x, digits = max(3L, getOption("digits") - 2L), 
     sep = ""
   )
 
+  if (!identical(x$ci_method, "disabled")) print_fit_mm_selection_note(x)
+
   invisible(x)
 }
 
@@ -236,7 +275,13 @@ predict.fit_mm <- function(object,
   grad <- mm_grad(x_new, beta["Vmax"], beta["Km"])
   mean_var <- rowSums((grad %*% vcov(object)) * grad)
   se_mean <- sqrt(pmax(mean_var, 0))
-  work_var <- object$scale * safe_pos(object$variance_fun(x_new))
+  h_values <- evaluate_variance_function(object$variance_fun, x_new)
+  if (identical(object$variance_model, "custom")) {
+    work_var <- object$normalized_scale * (h_values / object$variance_normalization)
+    validate_custom_variance_values(work_var, x_new)
+  } else {
+    work_var <- object$scale * h_values
+  }
 
   out <- data.frame(
     x = x_new,

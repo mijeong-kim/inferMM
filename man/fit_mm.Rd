@@ -11,7 +11,7 @@
 \title{Fit a Variance-Aware Michaelis-Menten Model}
 \usage{
 fit_mm(x, y,
-  variance = c("log", "sqrt", "cuberoot", "constant", "power", "auto"),
+  variance = "screen",
   power = NULL, power_selection = c("quasi_aic", "quasi_bic"),
   power_grid = default_power_grid(), interval_level = 0.95,
   km_bounds = NULL, allow_zero_substrate = TRUE)
@@ -53,11 +53,17 @@ fit_mm(x, y,
   \item{x}{Numeric vector of substrate concentrations. For the plot method, a
   fitted object of class \code{"fit_mm"}.}
   \item{y}{Numeric vector of observed reaction velocities.}
-  \item{variance}{Character string naming a built-in working variance model.
-  Use \code{"power"} with a fixed exponent or \code{"auto"} to compare
-  \code{log(S + 1)} against a grid of power functions.}
+  \item{variance}{A built-in working variance model name or a fixed, vectorized
+  function of concentration returning strictly positive values. Use
+  \code{\link{variance_function}} to attach a label to a custom function.
+  The default \code{"screen"} compares \code{"constant"}, \code{"log"},
+  \code{"sqrt"} and \code{"cuberoot"} and returns the selected fit.
+  Specify one fixed model or a function to fit only that shape.
+  Use \code{"power"} with a fixed exponent or \code{"auto"} for the
+  separate comparison of \code{log(S + 1)} against a grid of power functions.}
   \item{power}{Optional exponent used when \code{variance = "power"}.}
-  \item{power_selection}{Criterion used when \code{variance = "auto"}:
+  \item{power_selection}{Criterion used for \code{variance = "screen"} or
+  \code{variance = "auto"}:
   \code{"quasi_aic"} or \code{"quasi_bic"}.}
   \item{power_grid}{Candidate exponents considered when
   \code{variance = "auto"}.}
@@ -79,7 +85,7 @@ fit_mm(x, y,
   \item{wild_weights}{Wild-bootstrap multipliers used when
   \code{bootstrap_type = "wild"}: \code{"mammen"} or
   \code{"rademacher"}.}
-  \item{seed}{Deprecated and ignored. Call \code{stats::set.seed()} before
+  \item{seed}{Deprecated and ignored. Call \code{set.seed()} before
   bootstrap-based summaries or intervals if reproducibility is needed.}
   \item{digits}{Number of printed digits.}
   \item{newdata}{Optional numeric vector of new substrate concentrations.}
@@ -95,37 +101,160 @@ fit_mm(x, y,
 }
 \value{
 The main fitting function returns an object of class \code{"fit_mm"}.
+For the default four-shape comparison, \code{screen_table} contains all
+candidate results and a logical \code{selected} column. The same table is
+also stored in \code{variance_candidate_table};
+\code{variance_selection_mode} is \code{"screen"} and
+\code{variance_selection} records the criterion.
+Its \code{convergence} component records the standardized score norm,
+tolerance, search method, candidate roots, and scaled information condition.
 \code{predict()} returns either a numeric vector or a data frame containing
 prediction intervals.
 }
 \description{
 Estimate Michaelis-Menten parameters under a constant or
 concentration-dependent working variance specification.
+By default, compare four fixed variance shapes and return the selected fit
+with its screening table.
 }
 \details{
-Built-in working variance models are \code{"constant"}, \code{"log"},
-\code{"sqrt"}, \code{"cuberoot"}, \code{"power"}, and \code{"auto"}.
-All built-in single-curve fits use the Michaelis-Menten profile-score
-estimator from the companion methodology work, with the constant-variance case
-treated as the special case \eqn{h(S) \equiv 1}. Confidence intervals can be
+Reaction errors are treated as conditionally independent given concentrations.
+Default model-based intervals and observation-level bootstrap resampling do not
+automatically adjust for unrecorded shared sample, run, plate or calibration
+variation. Interval calculations condition on the specified variance shape.
+
+Omitting \code{variance}, or specifying \code{"screen"}, compares the four
+fixed shapes \code{"constant"}, \code{"log"}, \code{"sqrt"} and
+\code{"cuberoot"}. The fit with the smallest quasi-AIC is selected by
+default; \code{power_selection = "quasi_bic"} selects by quasi-BIC instead.
+On the same observations, these four candidates each estimate three parameters,
+so their AIC and BIC rankings agree. \code{print()} and \code{summary()}
+show the comparison table and selected estimates. Fitting alone does not
+print the table. Wald intervals and bootstrap refits for this default
+screen condition on the selected shape; bootstrap refits keep that shape
+fixed rather than repeating selection. Selection uncertainty is not included.
+To retain the former default, specify \code{variance = "log"} explicitly.
+
+The four fixed shapes can also be specified individually.
+\code{"power"} fits a supplied exponent, whereas \code{"auto"} retains
+the separate log/power-grid comparison described below.
+All single-curve fits use the Michaelis-Menten profile-score
+estimator, with the constant-variance case treated as the special case
+\eqn{h(S) \equiv 1}. For a fixed concentration-only variance shape,
+the Gaussian-working specialization of the conditional-moment score in
+Kim and Ma (2012, Section 3, Theorem 2) gives the weighted nonlinear
+least-squares mean equations described by Carroll and Ruppert (1988).
+Eliminating the linear height \eqn{V_{\max}} is a separable nonlinear
+least-squares reduction (Golub and Pereyra, 1973); the profile-score name
+refers to this elimination.
+
+Confidence intervals can be
 computed either from the default asymptotic Wald approximation or from a
 bootstrap refitting scheme. The bootstrap option supports percentile, basic,
-and studentized calibration, together with wild or pairs resampling. The
+and studentized calibration, together with wild or pairs resampling.
+Wild resampling keeps concentrations fixed, multiplies fitted residuals by
+Mammen's (1993) two-point multipliers by default, and refits the curve.
+Rademacher multipliers are also available. The
 default printed summaries suppress interval output when the fitted curve has
 fewer than 20 observations or fewer than 6 distinct substrate concentrations;
 in that setting, \code{confint()} remains available as an explicit sensitivity
-analysis tool and issues a warning. The automatic option compares
+analysis tool and issues a warning. The \code{variance = "auto"} option compares
 \code{log(S + 1)} with a user-supplied grid of \eqn{S^p} working variance
 functions and keeps the best fit according to quasi-AIC or quasi-BIC.
+
+The profile search examines sign-changing brackets on a 400-point log grid
+and verifies the mean score equations after solving. The diagnostic projects
+the \eqn{K_m} score direction off the eliminated \eqn{V_{\max}} direction
+and standardizes its residual inner product by both weighted norms; the
+\eqn{V_{\max}} equation is also checked. The maximum absolute standardized
+score must not exceed \eqn{10^{-7}}. If no bracketed root is verified,
+minimization of the squared standardized profile score supplies additional
+candidates, not automatically accepted estimates. Among detected positive
+interior roots passing these checks, the smallest weighted residual sum of
+squares determines the fitted root. A finite grid does not guarantee finding
+every root or a global minimum.
+
+Candidates within \eqn{10^{-6}} of either log search bound are rejected,
+as are non-positive or non-finite parameters and numerically zero residual
+variance. The mean information is scaled by its gradient-column magnitudes;
+a reciprocal condition number below \eqn{10^{-12}} stops covariance
+calculation. No ridge term is added to obtain the single-curve Wald covariance.
+These checks do not guarantee identifiability or accurate finite-sample coverage.
+
+Profile validation errors have class \code{inferMM_profile_error}, also
+inheriting from \code{inferMM_convergence_error}. They identify the failure
+stage, reason, search bounds, score norm, tolerance and candidate count, with
+information conditioning where relevant. No fit or confidence intervals are
+returned on these errors. Use \code{tryCatch()} to inspect the condition.
+Automatic variance selection records unsuccessful candidates in
+\code{variance_candidate_table} using \code{success = 0} and an
+\code{error_message}; they cannot be selected. If every candidate fails,
+selection stops. Screening and grouped workflows likewise record failures
+without reporting estimates or intervals for those curves. The profile pilot
+of \code{\link{fit_mm_moments}} uses the same root-validation checks;
+the later joint higher-moment solve has its own diagnostics. These new
+single-curve checks do not replace the separate clustered solver.
+
+A custom function specifies \eqn{h(S)} in
+\eqn{\operatorname{Var}(Y\mid S)=\gamma h(S)}; see
+\code{\link{variance_function}} for its input/output contract. Only \eqn{K_m}
+requires numerical search, followed by closed-form updates for \eqn{V_{\max}}
+and \eqn{\gamma}. The stored \code{variance_fun} is reused for new-data
+prediction and wild or pairs bootstrap refitting. Custom shapes are normalized
+internally for numerical scaling, without clipping; the reported \code{scale}
+is \eqn{\gamma} for the original supplied shape. Multiplying the shape by a
+positive constant changes \eqn{\gamma} inversely, not the fitted variance.
+Extremely ill-scaled shapes can still produce numerical errors.
+
+Custom shape parameters are not estimated. Wald covariance and working-Gaussian
+prediction bands condition on the fixed supplied shape. Quasi-AIC and quasi-BIC
+count three fitted parameters (\eqn{V_{\max}}, \eqn{K_m}, \eqn{\gamma});
+they do not account for coefficients fitted externally inside a custom function
+or for variance-model selection uncertainty. Free parameters, shapes depending on
+the fitted mean parameters, and data-adaptive variance-function estimation are
+outside this interface. The feature does not implement conditional third/fourth
+moment estimation or imply an efficiency gain over identically weighted
+nonlinear least squares. Prediction bands retain the existing working-normal
+approximation rather than estimating skewed predictive quantiles.
+}
+\references{
+\itemize{
+\item Carroll, R. J. and Ruppert, D. (1988).
+\emph{Transformation and Weighting in Regression}. Chapman and Hall, New York.
+
+\href{https://www.routledge.com/Transformation-and-Weighting-in-Regression/Carroll-Ruppert/p/book/9780412014215}{Publisher's book page}.
+
+\item Golub, G. H. and Pereyra, V. (1973). The differentiation of pseudo-inverses
+and nonlinear least squares problems whose variables separate.
+\emph{SIAM Journal on Numerical Analysis}, \bold{10}, 413--432.
+
+\doi{10.1137/0710036}.
+
+\item Kim, M. and Ma, Y. (2012). The efficiency of the second-order nonlinear
+least squares estimator and its extension.
+\emph{Annals of the Institute of Statistical Mathematics}, \bold{64}, 751--764.
+
+\doi{10.1007/s10463-011-0332-y}.
+
+\item Mammen, E. (1993). Bootstrap and wild bootstrap for high dimensional
+linear models. \emph{The Annals of Statistics}, \bold{21}, 255--285.
+
+\doi{10.1214/aos/1176349025}.
+}
 }
 \examples{
 one_curve <- subset(sdl_demo, enzyme == "1111")
 
 fit <- fit_mm(
   x = one_curve$s_uM,
-  y = one_curve$v_uM_per_min,
-  variance = "sqrt"
+  y = one_curve$v_uM_per_min
 )
+fit
+fit$screen_table[, c("model", "quasi_aic", "quasi_bic", "selected")]
+
+# Explicit shapes bypass the four-candidate screen.
+fit_sqrt <- fit_mm(one_curve$s_uM, one_curve$v_uM_per_min,
+                   variance = "sqrt")
 
 fit_power <- fit_mm(
   x = one_curve$s_uM,
@@ -152,6 +281,13 @@ confint(
   wild_weights = "mammen"
 )
 head(predict(fit, newdata = seq(0, 80, length.out = 6), interval = "prediction"))
+
+h <- variance_function(function(S) 1 + S / 20,
+                       label = "Var = gamma (1 + S/20)")
+fit_custom <- fit_mm(one_curve$s_uM, one_curve$v_uM_per_min, variance = h)
+summary(fit_custom)
+confint(fit_custom)
+head(predict(fit_custom, newdata = c(0, 10, 40), interval = "prediction"))
 
 \donttest{
 plot(fit)
