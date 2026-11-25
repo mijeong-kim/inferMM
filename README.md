@@ -21,8 +21,9 @@ The package is designed around a compact workflow:
 install.packages("inferMM")
 ```
 
-The package is available on CRAN. To reproduce version 0.1.2 exactly,
-install its archived source package:
+To reproduce the supplied 0.1.2 source revision before its CRAN release,
+install that archive explicitly; the general CRAN command may provide a
+different version:
 
 ```r
 install.packages("inferMM_0.1.2.tar.gz", repos = NULL, type = "source")

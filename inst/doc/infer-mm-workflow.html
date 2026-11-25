@@ -353,412 +353,710 @@ measurements within a core, plate, or sample may be correlated.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(inferMM)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>one_curve <span class="ot">&lt;-</span> <span class="fu">subset</span>(sdl_demo, enzyme <span class="sc">==</span> <span class="st">&quot;1111&quot;</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">fit_mm</span>(</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  <span class="at">x =</span> one_curve<span class="sc">$</span>s_uM,</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  <span class="at">y =</span> one_curve<span class="sc">$</span>v_uM_per_min,</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  <span class="at">variance =</span> <span class="st">&quot;sqrt&quot;</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>)</span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">summary</span>(fit)</span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; fit_mm(x = one_curve$s_uM, y = one_curve$v_uM_per_min, variance = &quot;sqrt&quot;)</span></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt; Method: profile-score </span></span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt; Working variance: Var = gamma S^(1/2) </span></span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co">#&gt; CI method: wald</span></span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co">#&gt;      Estimate Std. Error Lower CI Upper CI</span></span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#&gt; Vmax  6.43188    0.08808  6.25926   6.6045</span></span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt; Km   76.42907    2.36904 71.78583  81.0723</span></span>
-<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="co">#&gt; Scale:0.0012  RMSE:0.11978  Weighted RSS:28</span></span>
-<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="co">#&gt; Quasi-AIC:-44.87655  Quasi-BIC:-40.87994</span></span>
-<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>fit_auto <span class="ot">&lt;-</span> <span class="fu">fit_mm</span>(</span>
-<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a>  <span class="at">x =</span> one_curve<span class="sc">$</span>s_uM,</span>
-<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a>  <span class="at">y =</span> one_curve<span class="sc">$</span>v_uM_per_min,</span>
-<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a>  <span class="at">variance =</span> <span class="st">&quot;auto&quot;</span>,</span>
-<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a>  <span class="at">power_selection =</span> <span class="st">&quot;quasi_aic&quot;</span></span>
-<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a>)</span>
-<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a><span class="fu">summary</span>(fit_auto)</span>
-<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a><span class="co">#&gt; fit_mm(x = one_curve$s_uM, y = one_curve$v_uM_per_min, variance = &quot;auto&quot;, </span></span>
-<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a><span class="co">#&gt;     power_selection = &quot;quasi_aic&quot;)</span></span>
-<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a><span class="co">#&gt; Method: profile-score </span></span>
-<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a><span class="co">#&gt; Working variance: Var = gamma S^0.85 (selected by quasi-AIC from log/power candidates) </span></span>
-<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a><span class="co">#&gt; CI method: wald</span></span>
-<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a><span class="co">#&gt;      Estimate Std. Error Lower CI Upper CI</span></span>
-<span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a><span class="co">#&gt; Vmax  6.48388    0.10439  6.27927  6.68849</span></span>
-<span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a><span class="co">#&gt; Km   77.97381    2.36193 73.34452 82.60310</span></span>
-<span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-48"><a href="#cb1-48" tabindex="-1"></a><span class="co">#&gt; Scale:0.00026  RMSE:0.12129  Weighted RSS:28</span></span>
-<span id="cb1-49"><a href="#cb1-49" tabindex="-1"></a><span class="co">#&gt; Quasi-AIC:-46.89897  Quasi-BIC:-42.90235</span></span></code></pre></div>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">nrow</span>(one_curve)  <span class="co"># 32 rates: eight concentrations, four reactions each</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt; [1] 32</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">fit_mm</span>(</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  <span class="at">x =</span> one_curve<span class="sc">$</span>s_uM,</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  <span class="at">y =</span> one_curve<span class="sc">$</span>v_uM_per_min</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>)</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>fit</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt; fit_mm(x = one_curve$s_uM, y = one_curve$v_uM_per_min)</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt; Method: profile-score </span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#&gt; Working variance: Var = gamma S^(1/2) </span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#&gt; Variance-model screening:</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="co">#&gt;     model quasi_aic quasi_bic selected success</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="co">#&gt;      sqrt -60.71156 -56.31436     TRUE       1</span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co">#&gt;  cuberoot -56.26105 -51.86384    FALSE       1</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="co">#&gt;       log -53.98475 -49.58754    FALSE       1</span></span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="co">#&gt;  constant -43.10122 -38.70401    FALSE       1</span></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="co">#&gt; Selected model: sqrt (minimum quasi-AIC) </span></span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="co">#&gt;      Estimate Std. Error Lower CI Upper CI</span></span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="co">#&gt; Vmax  6.44520    0.08348  6.28158  6.60883</span></span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="co">#&gt; Km   76.96398    2.22408 72.60486 81.32309</span></span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a><span class="co">#&gt; Quasi-AIC:-60.71156  Quasi-BIC:-56.31436  RMSE:0.11267</span></span>
+<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a><span class="co">#&gt; Intervals condition on the selected variance model; model-selection uncertainty is not included.</span></span>
+<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a>fit<span class="sc">$</span>screen_table[, <span class="fu">c</span>(<span class="st">&quot;model&quot;</span>, <span class="st">&quot;quasi_aic&quot;</span>, <span class="st">&quot;quasi_bic&quot;</span>, <span class="st">&quot;selected&quot;</span>)]</span>
+<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a><span class="co">#&gt;      model quasi_aic quasi_bic selected</span></span>
+<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a><span class="co">#&gt; 1     sqrt -60.71156 -56.31436     TRUE</span></span>
+<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a><span class="co">#&gt; 2 cuberoot -56.26105 -51.86384    FALSE</span></span>
+<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a><span class="co">#&gt; 3      log -53.98475 -49.58754    FALSE</span></span>
+<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a><span class="co">#&gt; 4 constant -43.10122 -38.70401    FALSE</span></span>
+<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a><span class="fu">summary</span>(fit)</span>
+<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a><span class="co">#&gt; fit_mm(x = one_curve$s_uM, y = one_curve$v_uM_per_min)</span></span>
+<span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a><span class="co">#&gt; Method: profile-score </span></span>
+<span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a><span class="co">#&gt; Working variance: Var = gamma S^(1/2) </span></span>
+<span id="cb1-48"><a href="#cb1-48" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-49"><a href="#cb1-49" tabindex="-1"></a><span class="co">#&gt; Variance-model screening:</span></span>
+<span id="cb1-50"><a href="#cb1-50" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-51"><a href="#cb1-51" tabindex="-1"></a><span class="co">#&gt;     model quasi_aic quasi_bic selected success</span></span>
+<span id="cb1-52"><a href="#cb1-52" tabindex="-1"></a><span class="co">#&gt;      sqrt -60.71156 -56.31436     TRUE       1</span></span>
+<span id="cb1-53"><a href="#cb1-53" tabindex="-1"></a><span class="co">#&gt;  cuberoot -56.26105 -51.86384    FALSE       1</span></span>
+<span id="cb1-54"><a href="#cb1-54" tabindex="-1"></a><span class="co">#&gt;       log -53.98475 -49.58754    FALSE       1</span></span>
+<span id="cb1-55"><a href="#cb1-55" tabindex="-1"></a><span class="co">#&gt;  constant -43.10122 -38.70401    FALSE       1</span></span>
+<span id="cb1-56"><a href="#cb1-56" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-57"><a href="#cb1-57" tabindex="-1"></a><span class="co">#&gt; Selected model: sqrt (minimum quasi-AIC) </span></span>
+<span id="cb1-58"><a href="#cb1-58" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-59"><a href="#cb1-59" tabindex="-1"></a><span class="co">#&gt; CI method: wald</span></span>
+<span id="cb1-60"><a href="#cb1-60" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-61"><a href="#cb1-61" tabindex="-1"></a><span class="co">#&gt;      Estimate Std. Error Lower CI Upper CI</span></span>
+<span id="cb1-62"><a href="#cb1-62" tabindex="-1"></a><span class="co">#&gt; Vmax  6.44520    0.08348  6.28158  6.60883</span></span>
+<span id="cb1-63"><a href="#cb1-63" tabindex="-1"></a><span class="co">#&gt; Km   76.96398    2.22408 72.60486 81.32309</span></span>
+<span id="cb1-64"><a href="#cb1-64" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-65"><a href="#cb1-65" tabindex="-1"></a><span class="co">#&gt; Scale:0.0011  RMSE:0.11267  Weighted RSS:32</span></span>
+<span id="cb1-66"><a href="#cb1-66" tabindex="-1"></a><span class="co">#&gt; Quasi-AIC:-60.71156  Quasi-BIC:-56.31436</span></span>
+<span id="cb1-67"><a href="#cb1-67" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-68"><a href="#cb1-68" tabindex="-1"></a><span class="co">#&gt; Intervals condition on the selected variance model; model-selection uncertainty is not included.</span></span></code></pre></div>
+<p>When <code>variance</code> is omitted, <code>fit_mm()</code> compares
+<code>constant</code>, <code>log</code>, <code>sqrt</code> and
+<code>cuberoot</code>, then returns the lowest quasi-AIC fit as an
+ordinary <code>fit_mm</code> object. The printed fit and summary include
+the candidate comparison and selected model; the fitting call itself is
+quiet. This SDL example selects <code>sqrt</code>. All four candidates
+estimate three parameters on the same observations, so their AIC and BIC
+rankings agree. <code>power_selection = &quot;quasi_bic&quot;</code> can select by
+quasi-BIC instead.</p>
+<p>An explicit shape bypasses this screen. For example,
+<code>variance = &quot;log&quot;</code> preserves the former default, and
+<code>variance = &quot;sqrt&quot;</code> fits that shape directly. The separate
+<code>variance = &quot;auto&quot;</code> option still compares
+<code>log(S + 1)</code> with a grid of fixed power shapes:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>sqrt_fit <span class="ot">&lt;-</span> <span class="fu">fit_mm</span>(one_curve<span class="sc">$</span>s_uM, one_curve<span class="sc">$</span>v_uM_per_min, <span class="at">variance =</span> <span class="st">&quot;sqrt&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>fit_auto <span class="ot">&lt;-</span> <span class="fu">fit_mm</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">x =</span> one_curve<span class="sc">$</span>s_uM,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="at">y =</span> one_curve<span class="sc">$</span>v_uM_per_min,</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  <span class="at">variance =</span> <span class="st">&quot;auto&quot;</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="at">power_selection =</span> <span class="st">&quot;quasi_aic&quot;</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">summary</span>(fit_auto)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; fit_mm(x = one_curve$s_uM, y = one_curve$v_uM_per_min, variance = &quot;auto&quot;, </span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt;     power_selection = &quot;quasi_aic&quot;)</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; Method: profile-score </span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; Working variance: Var = gamma S^1 (selected by quasi-AIC from log/power candidates) </span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; CI method: wald</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt;      Estimate Std. Error Lower CI Upper CI</span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; Vmax  6.55883    0.11109  6.34111  6.77656</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt; Km   80.15368    2.30266 75.64056 84.66680</span></span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; Scale:0.00014  RMSE:0.11838  Weighted RSS:32</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt; Quasi-AIC:-66.28789  Quasi-BIC:-61.89068</span></span></code></pre></div>
 <p>The fitted object supports extraction of coefficients, Wald
-confidence intervals, bootstrap confidence intervals, and
-predictions.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">coef</span>(fit)</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt;     Vmax       Km </span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt;  6.43188 76.42907</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">confint</span>(fit)</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt;          lower     upper</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; Vmax  6.259256  6.604505</span></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; Km   71.785829 81.072301</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="fu">confint</span>(fit, <span class="at">method =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">B =</span> <span class="dv">99</span>, <span class="at">seed =</span> <span class="dv">1</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;          lower    upper</span></span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; Vmax  6.224301  6.63876</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; Km   71.079881 80.97992</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)</span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt;            Vmax       Km</span></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt;   [1,] 6.476014 79.83447</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt;   [2,] 6.378489 74.52054</span></span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt;   [3,] 6.315636 73.40745</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt;   [4,] 6.606759 81.49450</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt;   [5,] 6.355270 72.46983</span></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt;   [6,] 6.490773 78.61711</span></span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt;   [7,] 6.375798 76.89579</span></span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt;   [8,] 6.415435 77.91821</span></span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="co">#&gt;   [9,] 6.395333 75.79797</span></span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt;  [10,] 6.452104 75.77422</span></span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt;  [11,] 6.354902 73.64769</span></span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt;  [12,] 6.253890 72.46448</span></span>
-<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt;  [13,] 6.432755 76.48557</span></span>
-<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt;  [14,] 6.239816 72.73521</span></span>
-<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co">#&gt;  [15,] 6.392421 72.35687</span></span>
-<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co">#&gt;  [16,] 6.438676 75.82950</span></span>
-<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co">#&gt;  [17,] 6.407854 76.57698</span></span>
-<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="co">#&gt;  [18,] 6.418602 74.41747</span></span>
-<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="co">#&gt;  [19,] 6.416149 78.11960</span></span>
-<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="co">#&gt;  [20,] 6.398709 76.94679</span></span>
-<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="co">#&gt;  [21,] 6.409231 78.06683</span></span>
-<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a><span class="co">#&gt;  [22,] 6.414848 73.83375</span></span>
-<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a><span class="co">#&gt;  [23,] 6.596570 80.87162</span></span>
-<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a><span class="co">#&gt;  [24,] 6.445099 78.07890</span></span>
-<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a><span class="co">#&gt;  [25,] 6.566444 78.84445</span></span>
-<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a><span class="co">#&gt;  [26,] 6.316287 74.66422</span></span>
-<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a><span class="co">#&gt;  [27,] 6.393557 76.88738</span></span>
-<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a><span class="co">#&gt;  [28,] 6.458692 75.04789</span></span>
-<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a><span class="co">#&gt;  [29,] 6.379901 76.13779</span></span>
-<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a><span class="co">#&gt;  [30,] 6.257576 71.96651</span></span>
-<span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a><span class="co">#&gt;  [31,] 6.422571 75.72082</span></span>
-<span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a><span class="co">#&gt;  [32,] 6.464795 76.89847</span></span>
-<span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a><span class="co">#&gt;  [33,] 6.286777 73.34994</span></span>
-<span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a><span class="co">#&gt;  [34,] 6.471574 77.19526</span></span>
-<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a><span class="co">#&gt;  [35,] 6.449847 76.42107</span></span>
-<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a><span class="co">#&gt;  [36,] 6.371707 74.37569</span></span>
-<span id="cb2-50"><a href="#cb2-50" tabindex="-1"></a><span class="co">#&gt;  [37,] 6.357429 74.21841</span></span>
-<span id="cb2-51"><a href="#cb2-51" tabindex="-1"></a><span class="co">#&gt;  [38,] 6.357334 74.64551</span></span>
-<span id="cb2-52"><a href="#cb2-52" tabindex="-1"></a><span class="co">#&gt;  [39,] 6.531732 77.41515</span></span>
-<span id="cb2-53"><a href="#cb2-53" tabindex="-1"></a><span class="co">#&gt;  [40,] 6.372838 75.80516</span></span>
-<span id="cb2-54"><a href="#cb2-54" tabindex="-1"></a><span class="co">#&gt;  [41,] 6.640540 81.91559</span></span>
-<span id="cb2-55"><a href="#cb2-55" tabindex="-1"></a><span class="co">#&gt;  [42,] 6.427200 77.41146</span></span>
-<span id="cb2-56"><a href="#cb2-56" tabindex="-1"></a><span class="co">#&gt;  [43,] 6.243263 73.29175</span></span>
-<span id="cb2-57"><a href="#cb2-57" tabindex="-1"></a><span class="co">#&gt;  [44,] 6.580359 78.40103</span></span>
-<span id="cb2-58"><a href="#cb2-58" tabindex="-1"></a><span class="co">#&gt;  [45,] 6.359400 73.67905</span></span>
-<span id="cb2-59"><a href="#cb2-59" tabindex="-1"></a><span class="co">#&gt;  [46,] 6.546413 78.07210</span></span>
-<span id="cb2-60"><a href="#cb2-60" tabindex="-1"></a><span class="co">#&gt;  [47,] 6.494002 77.34733</span></span>
-<span id="cb2-61"><a href="#cb2-61" tabindex="-1"></a><span class="co">#&gt;  [48,] 6.368514 74.86933</span></span>
-<span id="cb2-62"><a href="#cb2-62" tabindex="-1"></a><span class="co">#&gt;  [49,] 6.431841 75.52364</span></span>
-<span id="cb2-63"><a href="#cb2-63" tabindex="-1"></a><span class="co">#&gt;  [50,] 6.451744 76.90597</span></span>
-<span id="cb2-64"><a href="#cb2-64" tabindex="-1"></a><span class="co">#&gt;  [51,] 6.453025 77.24754</span></span>
-<span id="cb2-65"><a href="#cb2-65" tabindex="-1"></a><span class="co">#&gt;  [52,] 6.484998 78.84887</span></span>
-<span id="cb2-66"><a href="#cb2-66" tabindex="-1"></a><span class="co">#&gt;  [53,] 6.444248 76.11355</span></span>
-<span id="cb2-67"><a href="#cb2-67" tabindex="-1"></a><span class="co">#&gt;  [54,] 6.416209 75.24676</span></span>
-<span id="cb2-68"><a href="#cb2-68" tabindex="-1"></a><span class="co">#&gt;  [55,] 6.458626 76.53895</span></span>
-<span id="cb2-69"><a href="#cb2-69" tabindex="-1"></a><span class="co">#&gt;  [56,] 6.304262 72.37091</span></span>
-<span id="cb2-70"><a href="#cb2-70" tabindex="-1"></a><span class="co">#&gt;  [57,] 6.390457 75.06245</span></span>
-<span id="cb2-71"><a href="#cb2-71" tabindex="-1"></a><span class="co">#&gt;  [58,] 6.369015 75.27856</span></span>
-<span id="cb2-72"><a href="#cb2-72" tabindex="-1"></a><span class="co">#&gt;  [59,] 6.411905 76.62328</span></span>
-<span id="cb2-73"><a href="#cb2-73" tabindex="-1"></a><span class="co">#&gt;  [60,] 6.335236 72.76626</span></span>
-<span id="cb2-74"><a href="#cb2-74" tabindex="-1"></a><span class="co">#&gt;  [61,] 6.449384 76.19105</span></span>
-<span id="cb2-75"><a href="#cb2-75" tabindex="-1"></a><span class="co">#&gt;  [62,] 6.350371 74.00297</span></span>
-<span id="cb2-76"><a href="#cb2-76" tabindex="-1"></a><span class="co">#&gt;  [63,] 6.389128 75.40213</span></span>
-<span id="cb2-77"><a href="#cb2-77" tabindex="-1"></a><span class="co">#&gt;  [64,] 6.509621 78.61138</span></span>
-<span id="cb2-78"><a href="#cb2-78" tabindex="-1"></a><span class="co">#&gt;  [65,] 6.498540 77.34006</span></span>
-<span id="cb2-79"><a href="#cb2-79" tabindex="-1"></a><span class="co">#&gt;  [66,] 6.297257 74.08351</span></span>
-<span id="cb2-80"><a href="#cb2-80" tabindex="-1"></a><span class="co">#&gt;  [67,] 6.304905 73.09759</span></span>
-<span id="cb2-81"><a href="#cb2-81" tabindex="-1"></a><span class="co">#&gt;  [68,] 6.650319 82.14755</span></span>
-<span id="cb2-82"><a href="#cb2-82" tabindex="-1"></a><span class="co">#&gt;  [69,] 6.259182 72.65697</span></span>
-<span id="cb2-83"><a href="#cb2-83" tabindex="-1"></a><span class="co">#&gt;  [70,] 6.620325 80.46960</span></span>
-<span id="cb2-84"><a href="#cb2-84" tabindex="-1"></a><span class="co">#&gt;  [71,] 6.444258 77.05716</span></span>
-<span id="cb2-85"><a href="#cb2-85" tabindex="-1"></a><span class="co">#&gt;  [72,] 6.618748 80.11028</span></span>
-<span id="cb2-86"><a href="#cb2-86" tabindex="-1"></a><span class="co">#&gt;  [73,] 6.430931 77.26469</span></span>
-<span id="cb2-87"><a href="#cb2-87" tabindex="-1"></a><span class="co">#&gt;  [74,] 6.651050 82.28822</span></span>
-<span id="cb2-88"><a href="#cb2-88" tabindex="-1"></a><span class="co">#&gt;  [75,] 6.398579 76.10857</span></span>
-<span id="cb2-89"><a href="#cb2-89" tabindex="-1"></a><span class="co">#&gt;  [76,] 6.531708 76.63966</span></span>
-<span id="cb2-90"><a href="#cb2-90" tabindex="-1"></a><span class="co">#&gt;  [77,] 6.470498 76.55241</span></span>
-<span id="cb2-91"><a href="#cb2-91" tabindex="-1"></a><span class="co">#&gt;  [78,] 6.501117 78.43636</span></span>
-<span id="cb2-92"><a href="#cb2-92" tabindex="-1"></a><span class="co">#&gt;  [79,] 6.485008 77.65040</span></span>
-<span id="cb2-93"><a href="#cb2-93" tabindex="-1"></a><span class="co">#&gt;  [80,] 6.485931 77.24606</span></span>
-<span id="cb2-94"><a href="#cb2-94" tabindex="-1"></a><span class="co">#&gt;  [81,] 6.415493 75.51380</span></span>
-<span id="cb2-95"><a href="#cb2-95" tabindex="-1"></a><span class="co">#&gt;  [82,] 6.443932 74.05108</span></span>
-<span id="cb2-96"><a href="#cb2-96" tabindex="-1"></a><span class="co">#&gt;  [83,] 6.325003 73.76095</span></span>
-<span id="cb2-97"><a href="#cb2-97" tabindex="-1"></a><span class="co">#&gt;  [84,] 6.323352 74.28236</span></span>
-<span id="cb2-98"><a href="#cb2-98" tabindex="-1"></a><span class="co">#&gt;  [85,] 6.537225 78.46154</span></span>
-<span id="cb2-99"><a href="#cb2-99" tabindex="-1"></a><span class="co">#&gt;  [86,] 6.425373 77.41009</span></span>
-<span id="cb2-100"><a href="#cb2-100" tabindex="-1"></a><span class="co">#&gt;  [87,] 6.631429 81.96381</span></span>
-<span id="cb2-101"><a href="#cb2-101" tabindex="-1"></a><span class="co">#&gt;  [88,] 6.380613 75.35240</span></span>
-<span id="cb2-102"><a href="#cb2-102" tabindex="-1"></a><span class="co">#&gt;  [89,] 6.483115 77.88982</span></span>
-<span id="cb2-103"><a href="#cb2-103" tabindex="-1"></a><span class="co">#&gt;  [90,] 6.338270 74.75712</span></span>
-<span id="cb2-104"><a href="#cb2-104" tabindex="-1"></a><span class="co">#&gt;  [91,] 6.560837 76.39026</span></span>
-<span id="cb2-105"><a href="#cb2-105" tabindex="-1"></a><span class="co">#&gt;  [92,] 6.553474 80.97582</span></span>
-<span id="cb2-106"><a href="#cb2-106" tabindex="-1"></a><span class="co">#&gt;  [93,] 6.393651 74.96486</span></span>
-<span id="cb2-107"><a href="#cb2-107" tabindex="-1"></a><span class="co">#&gt;  [94,] 6.500069 77.84719</span></span>
-<span id="cb2-108"><a href="#cb2-108" tabindex="-1"></a><span class="co">#&gt;  [95,] 6.469865 77.91693</span></span>
-<span id="cb2-109"><a href="#cb2-109" tabindex="-1"></a><span class="co">#&gt;  [96,] 6.341839 75.80376</span></span>
-<span id="cb2-110"><a href="#cb2-110" tabindex="-1"></a><span class="co">#&gt;  [97,] 6.459499 78.36327</span></span>
-<span id="cb2-111"><a href="#cb2-111" tabindex="-1"></a><span class="co">#&gt;  [98,] 6.358715 73.68685</span></span>
-<span id="cb2-112"><a href="#cb2-112" tabindex="-1"></a><span class="co">#&gt;  [99,] 6.322227 72.95035</span></span>
-<span id="cb2-113"><a href="#cb2-113" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)attr(,&quot;requested_B&quot;)</span></span>
-<span id="cb2-114"><a href="#cb2-114" tabindex="-1"></a><span class="co">#&gt; [1] 99</span></span>
-<span id="cb2-115"><a href="#cb2-115" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)attr(,&quot;successful_B&quot;)</span></span>
-<span id="cb2-116"><a href="#cb2-116" tabindex="-1"></a><span class="co">#&gt; [1] 99</span></span>
-<span id="cb2-117"><a href="#cb2-117" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)attr(,&quot;bootstrap_type&quot;)</span></span>
-<span id="cb2-118"><a href="#cb2-118" tabindex="-1"></a><span class="co">#&gt; [1] &quot;wild&quot;</span></span>
-<span id="cb2-119"><a href="#cb2-119" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)attr(,&quot;wild_weights&quot;)</span></span>
-<span id="cb2-120"><a href="#cb2-120" tabindex="-1"></a><span class="co">#&gt; [1] &quot;mammen&quot;</span></span>
-<span id="cb2-121"><a href="#cb2-121" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)attr(,&quot;se_draws&quot;)</span></span>
-<span id="cb2-122"><a href="#cb2-122" tabindex="-1"></a><span class="co">#&gt;              Vmax       Km</span></span>
-<span id="cb2-123"><a href="#cb2-123" tabindex="-1"></a><span class="co">#&gt;   [1,] 0.06985208 1.935124</span></span>
-<span id="cb2-124"><a href="#cb2-124" tabindex="-1"></a><span class="co">#&gt;   [2,] 0.10246839 2.721211</span></span>
-<span id="cb2-125"><a href="#cb2-125" tabindex="-1"></a><span class="co">#&gt;   [3,] 0.06735485 1.783951</span></span>
-<span id="cb2-126"><a href="#cb2-126" tabindex="-1"></a><span class="co">#&gt;   [4,] 0.08946312 2.471365</span></span>
-<span id="cb2-127"><a href="#cb2-127" tabindex="-1"></a><span class="co">#&gt;   [5,] 0.08391186 2.185031</span></span>
-<span id="cb2-128"><a href="#cb2-128" tabindex="-1"></a><span class="co">#&gt;   [6,] 0.08787750 2.398055</span></span>
-<span id="cb2-129"><a href="#cb2-129" tabindex="-1"></a><span class="co">#&gt;   [7,] 0.08215916 2.240689</span></span>
-<span id="cb2-130"><a href="#cb2-130" tabindex="-1"></a><span class="co">#&gt;   [8,] 0.08112749 2.223237</span></span>
-<span id="cb2-131"><a href="#cb2-131" tabindex="-1"></a><span class="co">#&gt;   [9,] 0.06964822 1.871104</span></span>
-<span id="cb2-132"><a href="#cb2-132" tabindex="-1"></a><span class="co">#&gt;  [10,] 0.06270605 1.669348</span></span>
-<span id="cb2-133"><a href="#cb2-133" tabindex="-1"></a><span class="co">#&gt;  [11,] 0.09723531 2.566446</span></span>
-<span id="cb2-134"><a href="#cb2-134" tabindex="-1"></a><span class="co">#&gt;  [12,] 0.07315613 1.935708</span></span>
-<span id="cb2-135"><a href="#cb2-135" tabindex="-1"></a><span class="co">#&gt;  [13,] 0.06387095 1.718819</span></span>
-<span id="cb2-136"><a href="#cb2-136" tabindex="-1"></a><span class="co">#&gt;  [14,] 0.06907691 1.837610</span></span>
-<span id="cb2-137"><a href="#cb2-137" tabindex="-1"></a><span class="co">#&gt;  [15,] 0.08942662 2.312088</span></span>
-<span id="cb2-138"><a href="#cb2-138" tabindex="-1"></a><span class="co">#&gt;  [16,] 0.06834826 1.824457</span></span>
-<span id="cb2-139"><a href="#cb2-139" tabindex="-1"></a><span class="co">#&gt;  [17,] 0.06262306 1.693470</span></span>
-<span id="cb2-140"><a href="#cb2-140" tabindex="-1"></a><span class="co">#&gt;  [18,] 0.09244142 2.436773</span></span>
-<span id="cb2-141"><a href="#cb2-141" tabindex="-1"></a><span class="co">#&gt;  [19,] 0.09928960 2.726513</span></span>
-<span id="cb2-142"><a href="#cb2-142" tabindex="-1"></a><span class="co">#&gt;  [20,] 0.07677103 2.087400</span></span>
-<span id="cb2-143"><a href="#cb2-143" tabindex="-1"></a><span class="co">#&gt;  [21,] 0.07698530 2.115122</span></span>
-<span id="cb2-144"><a href="#cb2-144" tabindex="-1"></a><span class="co">#&gt;  [22,] 0.09008626 2.360508</span></span>
-<span id="cb2-145"><a href="#cb2-145" tabindex="-1"></a><span class="co">#&gt;  [23,] 0.08547042 2.349661</span></span>
-<span id="cb2-146"><a href="#cb2-146" tabindex="-1"></a><span class="co">#&gt;  [24,] 0.07809181 2.133862</span></span>
-<span id="cb2-147"><a href="#cb2-147" tabindex="-1"></a><span class="co">#&gt;  [25,] 0.07836180 2.118843</span></span>
-<span id="cb2-148"><a href="#cb2-148" tabindex="-1"></a><span class="co">#&gt;  [26,] 0.07504769 2.015870</span></span>
-<span id="cb2-149"><a href="#cb2-149" tabindex="-1"></a><span class="co">#&gt;  [27,] 0.06357009 1.728746</span></span>
-<span id="cb2-150"><a href="#cb2-150" tabindex="-1"></a><span class="co">#&gt;  [28,] 0.11550177 3.047138</span></span>
-<span id="cb2-151"><a href="#cb2-151" tabindex="-1"></a><span class="co">#&gt;  [29,] 0.07788269 2.105225</span></span>
-<span id="cb2-152"><a href="#cb2-152" tabindex="-1"></a><span class="co">#&gt;  [30,] 0.09938417 2.613052</span></span>
-<span id="cb2-153"><a href="#cb2-153" tabindex="-1"></a><span class="co">#&gt;  [31,] 0.05738243 1.533743</span></span>
-<span id="cb2-154"><a href="#cb2-154" tabindex="-1"></a><span class="co">#&gt;  [32,] 0.08069294 2.170478</span></span>
-<span id="cb2-155"><a href="#cb2-155" tabindex="-1"></a><span class="co">#&gt;  [33,] 0.06924554 1.841238</span></span>
-<span id="cb2-156"><a href="#cb2-156" tabindex="-1"></a><span class="co">#&gt;  [34,] 0.12740395 3.434337</span></span>
-<span id="cb2-157"><a href="#cb2-157" tabindex="-1"></a><span class="co">#&gt;  [35,] 0.07649214 2.051568</span></span>
-<span id="cb2-158"><a href="#cb2-158" tabindex="-1"></a><span class="co">#&gt;  [36,] 0.06966066 1.848912</span></span>
-<span id="cb2-159"><a href="#cb2-159" tabindex="-1"></a><span class="co">#&gt;  [37,] 0.07615177 2.022158</span></span>
-<span id="cb2-160"><a href="#cb2-160" tabindex="-1"></a><span class="co">#&gt;  [38,] 0.06883002 1.836538</span></span>
-<span id="cb2-161"><a href="#cb2-161" tabindex="-1"></a><span class="co">#&gt;  [39,] 0.11082711 2.967009</span></span>
-<span id="cb2-162"><a href="#cb2-162" tabindex="-1"></a><span class="co">#&gt;  [40,] 0.06943604 1.872134</span></span>
-<span id="cb2-163"><a href="#cb2-163" tabindex="-1"></a><span class="co">#&gt;  [41,] 0.08286175 2.287154</span></span>
-<span id="cb2-164"><a href="#cb2-164" tabindex="-1"></a><span class="co">#&gt;  [42,] 0.06895697 1.876023</span></span>
-<span id="cb2-165"><a href="#cb2-165" tabindex="-1"></a><span class="co">#&gt;  [43,] 0.08397688 2.247013</span></span>
-<span id="cb2-166"><a href="#cb2-166" tabindex="-1"></a><span class="co">#&gt;  [44,] 0.11008318 2.956345</span></span>
-<span id="cb2-167"><a href="#cb2-167" tabindex="-1"></a><span class="co">#&gt;  [45,] 0.10509946 2.773038</span></span>
-<span id="cb2-168"><a href="#cb2-168" tabindex="-1"></a><span class="co">#&gt;  [46,] 0.11417859 3.071443</span></span>
-<span id="cb2-169"><a href="#cb2-169" tabindex="-1"></a><span class="co">#&gt;  [47,] 0.06588085 1.772678</span></span>
-<span id="cb2-170"><a href="#cb2-170" tabindex="-1"></a><span class="co">#&gt;  [48,] 0.07496306 2.001667</span></span>
-<span id="cb2-171"><a href="#cb2-171" tabindex="-1"></a><span class="co">#&gt;  [49,] 0.05970155 1.589968</span></span>
-<span id="cb2-172"><a href="#cb2-172" tabindex="-1"></a><span class="co">#&gt;  [50,] 0.10320772 2.781921</span></span>
-<span id="cb2-173"><a href="#cb2-173" tabindex="-1"></a><span class="co">#&gt;  [51,] 0.06368762 1.722687</span></span>
-<span id="cb2-174"><a href="#cb2-174" tabindex="-1"></a><span class="co">#&gt;  [52,] 0.06434465 1.761755</span></span>
-<span id="cb2-175"><a href="#cb2-175" tabindex="-1"></a><span class="co">#&gt;  [53,] 0.06786972 1.815773</span></span>
-<span id="cb2-176"><a href="#cb2-176" tabindex="-1"></a><span class="co">#&gt;  [54,] 0.10341771 2.752472</span></span>
-<span id="cb2-177"><a href="#cb2-177" tabindex="-1"></a><span class="co">#&gt;  [55,] 0.07591162 2.035847</span></span>
-<span id="cb2-178"><a href="#cb2-178" tabindex="-1"></a><span class="co">#&gt;  [56,] 0.10580533 2.774245</span></span>
-<span id="cb2-179"><a href="#cb2-179" tabindex="-1"></a><span class="co">#&gt;  [57,] 0.08402381 2.240719</span></span>
-<span id="cb2-180"><a href="#cb2-180" tabindex="-1"></a><span class="co">#&gt;  [58,] 0.07026170 1.884538</span></span>
-<span id="cb2-181"><a href="#cb2-181" tabindex="-1"></a><span class="co">#&gt;  [59,] 0.08045964 2.175535</span></span>
-<span id="cb2-182"><a href="#cb2-182" tabindex="-1"></a><span class="co">#&gt;  [60,] 0.09580167 2.511072</span></span>
-<span id="cb2-183"><a href="#cb2-183" tabindex="-1"></a><span class="co">#&gt;  [61,] 0.09470489 2.533849</span></span>
-<span id="cb2-184"><a href="#cb2-184" tabindex="-1"></a><span class="co">#&gt;  [62,] 0.10681429 2.832647</span></span>
-<span id="cb2-185"><a href="#cb2-185" tabindex="-1"></a><span class="co">#&gt;  [63,] 0.06495163 1.739009</span></span>
-<span id="cb2-186"><a href="#cb2-186" tabindex="-1"></a><span class="co">#&gt;  [64,] 0.08706395 2.368834</span></span>
-<span id="cb2-187"><a href="#cb2-187" tabindex="-1"></a><span class="co">#&gt;  [65,] 0.09176504 2.467235</span></span>
-<span id="cb2-188"><a href="#cb2-188" tabindex="-1"></a><span class="co">#&gt;  [66,] 0.08347602 2.234426</span></span>
-<span id="cb2-189"><a href="#cb2-189" tabindex="-1"></a><span class="co">#&gt;  [67,] 0.10286184 2.719394</span></span>
-<span id="cb2-190"><a href="#cb2-190" tabindex="-1"></a><span class="co">#&gt;  [68,] 0.09143797 2.526102</span></span>
-<span id="cb2-191"><a href="#cb2-191" tabindex="-1"></a><span class="co">#&gt;  [69,] 0.06791179 1.799408</span></span>
-<span id="cb2-192"><a href="#cb2-192" tabindex="-1"></a><span class="co">#&gt;  [70,] 0.08130941 2.218032</span></span>
-<span id="cb2-193"><a href="#cb2-193" tabindex="-1"></a><span class="co">#&gt;  [71,] 0.06825023 1.844812</span></span>
-<span id="cb2-194"><a href="#cb2-194" tabindex="-1"></a><span class="co">#&gt;  [72,] 0.11440296 3.109920</span></span>
-<span id="cb2-195"><a href="#cb2-195" tabindex="-1"></a><span class="co">#&gt;  [73,] 0.06073428 1.648749</span></span>
-<span id="cb2-196"><a href="#cb2-196" tabindex="-1"></a><span class="co">#&gt;  [74,] 0.07796900 2.156834</span></span>
-<span id="cb2-197"><a href="#cb2-197" tabindex="-1"></a><span class="co">#&gt;  [75,] 0.07508047 2.022909</span></span>
-<span id="cb2-198"><a href="#cb2-198" tabindex="-1"></a><span class="co">#&gt;  [76,] 0.10677764 2.834709</span></span>
-<span id="cb2-199"><a href="#cb2-199" tabindex="-1"></a><span class="co">#&gt;  [77,] 0.09604369 2.571415</span></span>
-<span id="cb2-200"><a href="#cb2-200" tabindex="-1"></a><span class="co">#&gt;  [78,] 0.08721350 2.371596</span></span>
-<span id="cb2-201"><a href="#cb2-201" tabindex="-1"></a><span class="co">#&gt;  [79,] 0.06570885 1.776283</span></span>
-<span id="cb2-202"><a href="#cb2-202" tabindex="-1"></a><span class="co">#&gt;  [80,] 0.05785708 1.557014</span></span>
-<span id="cb2-203"><a href="#cb2-203" tabindex="-1"></a><span class="co">#&gt;  [81,] 0.06421274 1.714279</span></span>
-<span id="cb2-204"><a href="#cb2-204" tabindex="-1"></a><span class="co">#&gt;  [82,] 0.09237578 2.415500</span></span>
-<span id="cb2-205"><a href="#cb2-205" tabindex="-1"></a><span class="co">#&gt;  [83,] 0.07133711 1.894212</span></span>
-<span id="cb2-206"><a href="#cb2-206" tabindex="-1"></a><span class="co">#&gt;  [84,] 0.09829563 2.626123</span></span>
-<span id="cb2-207"><a href="#cb2-207" tabindex="-1"></a><span class="co">#&gt;  [85,] 0.09614009 2.600597</span></span>
-<span id="cb2-208"><a href="#cb2-208" tabindex="-1"></a><span class="co">#&gt;  [86,] 0.06440193 1.752572</span></span>
-<span id="cb2-209"><a href="#cb2-209" tabindex="-1"></a><span class="co">#&gt;  [87,] 0.09357089 2.587562</span></span>
-<span id="cb2-210"><a href="#cb2-210" tabindex="-1"></a><span class="co">#&gt;  [88,] 0.07474818 2.002868</span></span>
-<span id="cb2-211"><a href="#cb2-211" tabindex="-1"></a><span class="co">#&gt;  [89,] 0.06268655 1.699433</span></span>
-<span id="cb2-212"><a href="#cb2-212" tabindex="-1"></a><span class="co">#&gt;  [90,] 0.10975734 2.941041</span></span>
-<span id="cb2-213"><a href="#cb2-213" tabindex="-1"></a><span class="co">#&gt;  [91,] 0.10045591 2.647836</span></span>
-<span id="cb2-214"><a href="#cb2-214" tabindex="-1"></a><span class="co">#&gt;  [92,] 0.07292105 2.020010</span></span>
-<span id="cb2-215"><a href="#cb2-215" tabindex="-1"></a><span class="co">#&gt;  [93,] 0.09533099 2.538228</span></span>
-<span id="cb2-216"><a href="#cb2-216" tabindex="-1"></a><span class="co">#&gt;  [94,] 0.05871973 1.587018</span></span>
-<span id="cb2-217"><a href="#cb2-217" tabindex="-1"></a><span class="co">#&gt;  [95,] 0.06068649 1.649058</span></span>
-<span id="cb2-218"><a href="#cb2-218" tabindex="-1"></a><span class="co">#&gt;  [96,] 0.07445737 2.017298</span></span>
-<span id="cb2-219"><a href="#cb2-219" tabindex="-1"></a><span class="co">#&gt;  [97,] 0.07664515 2.096006</span></span>
-<span id="cb2-220"><a href="#cb2-220" tabindex="-1"></a><span class="co">#&gt;  [98,] 0.09689460 2.557056</span></span>
-<span id="cb2-221"><a href="#cb2-221" tabindex="-1"></a><span class="co">#&gt;  [99,] 0.09746000 2.565203</span></span>
-<span id="cb2-222"><a href="#cb2-222" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)attr(,&quot;bootstrap_ci&quot;)</span></span>
-<span id="cb2-223"><a href="#cb2-223" tabindex="-1"></a><span class="co">#&gt; [1] &quot;studentized&quot;</span></span>
-<span id="cb2-224"><a href="#cb2-224" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">predict</span>(fit, <span class="at">newdata =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">80</span>, <span class="at">length.out =</span> <span class="dv">6</span>), <span class="at">interval =</span> <span class="st">&quot;prediction&quot;</span>))</span>
-<span id="cb2-225"><a href="#cb2-225" tabindex="-1"></a><span class="co">#&gt;    x      fit     se.fit working_variance           lwr          upr</span></span>
-<span id="cb2-226"><a href="#cb2-226" tabindex="-1"></a><span class="co">#&gt; 1  0 0.000000 0.00000000     1.203550e-11 -6.799549e-06 6.799549e-06</span></span>
-<span id="cb2-227"><a href="#cb2-227" tabindex="-1"></a><span class="co">#&gt; 2 16 1.113395 0.01709891     4.814198e-03  9.733357e-01 1.253455e+00</span></span>
-<span id="cb2-228"><a href="#cb2-228" tabindex="-1"></a><span class="co">#&gt; 3 32 1.898201 0.02294258     6.808304e-03  1.730345e+00 2.066058e+00</span></span>
-<span id="cb2-229"><a href="#cb2-229" tabindex="-1"></a><span class="co">#&gt; 4 48 2.481175 0.02455237     8.338436e-03  2.295844e+00 2.666505e+00</span></span>
-<span id="cb2-230"><a href="#cb2-230" tabindex="-1"></a><span class="co">#&gt; 5 64 2.931304 0.02479206     9.628397e-03  2.732941e+00 3.129668e+00</span></span>
-<span id="cb2-231"><a href="#cb2-231" tabindex="-1"></a><span class="co">#&gt; 6 80 3.289353 0.02489137     1.076487e-02  3.080229e+00 3.498477e+00</span></span></code></pre></div>
+confidence intervals, bootstrap confidence intervals, and predictions.
+For the default four-shape screen, intervals condition on the selected
+shape, and bootstrap refits keep that shape fixed. These intervals omit
+model-selection uncertainty.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">coef</span>(fit)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt;      Vmax        Km </span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt;  6.445201 76.963978</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">confint</span>(fit)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt;          lower     upper</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; Vmax  6.281577  6.608825</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; Km   72.604863 81.323094</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="fu">confint</span>(fit, <span class="at">method =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">B =</span> <span class="dv">99</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt;          lower     upper</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; Vmax  6.218953  6.655811</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; Km   71.408873 82.011496</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt;            Vmax       Km</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt;   [1,] 6.634191 80.59446</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt;   [2,] 6.624140 79.02914</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt;   [3,] 6.381217 75.47213</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt;   [4,] 6.579378 79.06645</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt;   [5,] 6.459370 75.13569</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt;   [6,] 6.514508 76.85696</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt;   [7,] 6.431241 78.51044</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt;   [8,] 6.333733 76.77147</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt;   [9,] 6.429045 77.71514</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt;  [10,] 6.430622 75.90861</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt;  [11,] 6.437842 77.99273</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt;  [12,] 6.470516 78.80971</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt;  [13,] 6.435140 78.41032</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt;  [14,] 6.452888 76.32602</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt;  [15,] 6.596845 80.60650</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt;  [16,] 6.505647 80.42294</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt;  [17,] 6.336328 72.54563</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt;  [18,] 6.414559 76.67374</span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="co">#&gt;  [19,] 6.383144 75.31857</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt;  [20,] 6.395584 75.41049</span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co">#&gt;  [21,] 6.460867 78.69901</span></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co">#&gt;  [22,] 6.470352 77.74889</span></span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt;  [23,] 6.600720 81.49759</span></span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt;  [24,] 6.461286 76.85821</span></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt;  [25,] 6.440780 75.36456</span></span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a><span class="co">#&gt;  [26,] 6.402931 74.83632</span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="co">#&gt;  [27,] 6.507135 79.54802</span></span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a><span class="co">#&gt;  [28,] 6.472693 77.05218</span></span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co">#&gt;  [29,] 6.377078 76.29782</span></span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a><span class="co">#&gt;  [30,] 6.595221 80.72817</span></span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a><span class="co">#&gt;  [31,] 6.657488 81.33797</span></span>
+<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a><span class="co">#&gt;  [32,] 6.369616 75.06435</span></span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a><span class="co">#&gt;  [33,] 6.286213 74.35536</span></span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a><span class="co">#&gt;  [34,] 6.390055 77.24934</span></span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a><span class="co">#&gt;  [35,] 6.382849 76.30863</span></span>
+<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a><span class="co">#&gt;  [36,] 6.663777 83.42949</span></span>
+<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a><span class="co">#&gt;  [37,] 6.377339 75.71846</span></span>
+<span id="cb3-52"><a href="#cb3-52" tabindex="-1"></a><span class="co">#&gt;  [38,] 6.446631 78.61387</span></span>
+<span id="cb3-53"><a href="#cb3-53" tabindex="-1"></a><span class="co">#&gt;  [39,] 6.506397 77.23510</span></span>
+<span id="cb3-54"><a href="#cb3-54" tabindex="-1"></a><span class="co">#&gt;  [40,] 6.339345 74.84123</span></span>
+<span id="cb3-55"><a href="#cb3-55" tabindex="-1"></a><span class="co">#&gt;  [41,] 6.358060 75.53405</span></span>
+<span id="cb3-56"><a href="#cb3-56" tabindex="-1"></a><span class="co">#&gt;  [42,] 6.383473 75.47787</span></span>
+<span id="cb3-57"><a href="#cb3-57" tabindex="-1"></a><span class="co">#&gt;  [43,] 6.430971 74.04655</span></span>
+<span id="cb3-58"><a href="#cb3-58" tabindex="-1"></a><span class="co">#&gt;  [44,] 6.350545 75.25444</span></span>
+<span id="cb3-59"><a href="#cb3-59" tabindex="-1"></a><span class="co">#&gt;  [45,] 6.287727 73.89329</span></span>
+<span id="cb3-60"><a href="#cb3-60" tabindex="-1"></a><span class="co">#&gt;  [46,] 6.443948 76.14249</span></span>
+<span id="cb3-61"><a href="#cb3-61" tabindex="-1"></a><span class="co">#&gt;  [47,] 6.246904 72.56499</span></span>
+<span id="cb3-62"><a href="#cb3-62" tabindex="-1"></a><span class="co">#&gt;  [48,] 6.488523 78.66055</span></span>
+<span id="cb3-63"><a href="#cb3-63" tabindex="-1"></a><span class="co">#&gt;  [49,] 6.312024 72.69961</span></span>
+<span id="cb3-64"><a href="#cb3-64" tabindex="-1"></a><span class="co">#&gt;  [50,] 6.461288 79.41380</span></span>
+<span id="cb3-65"><a href="#cb3-65" tabindex="-1"></a><span class="co">#&gt;  [51,] 6.222701 69.86802</span></span>
+<span id="cb3-66"><a href="#cb3-66" tabindex="-1"></a><span class="co">#&gt;  [52,] 6.474113 77.61923</span></span>
+<span id="cb3-67"><a href="#cb3-67" tabindex="-1"></a><span class="co">#&gt;  [53,] 6.551880 78.00878</span></span>
+<span id="cb3-68"><a href="#cb3-68" tabindex="-1"></a><span class="co">#&gt;  [54,] 6.412938 76.32565</span></span>
+<span id="cb3-69"><a href="#cb3-69" tabindex="-1"></a><span class="co">#&gt;  [55,] 6.459186 76.70207</span></span>
+<span id="cb3-70"><a href="#cb3-70" tabindex="-1"></a><span class="co">#&gt;  [56,] 6.518784 79.07483</span></span>
+<span id="cb3-71"><a href="#cb3-71" tabindex="-1"></a><span class="co">#&gt;  [57,] 6.269093 71.43075</span></span>
+<span id="cb3-72"><a href="#cb3-72" tabindex="-1"></a><span class="co">#&gt;  [58,] 6.412737 75.39622</span></span>
+<span id="cb3-73"><a href="#cb3-73" tabindex="-1"></a><span class="co">#&gt;  [59,] 6.512970 78.51215</span></span>
+<span id="cb3-74"><a href="#cb3-74" tabindex="-1"></a><span class="co">#&gt;  [60,] 6.351575 74.15987</span></span>
+<span id="cb3-75"><a href="#cb3-75" tabindex="-1"></a><span class="co">#&gt;  [61,] 6.418711 74.28195</span></span>
+<span id="cb3-76"><a href="#cb3-76" tabindex="-1"></a><span class="co">#&gt;  [62,] 6.366252 74.88653</span></span>
+<span id="cb3-77"><a href="#cb3-77" tabindex="-1"></a><span class="co">#&gt;  [63,] 6.630996 80.55090</span></span>
+<span id="cb3-78"><a href="#cb3-78" tabindex="-1"></a><span class="co">#&gt;  [64,] 6.606226 80.62509</span></span>
+<span id="cb3-79"><a href="#cb3-79" tabindex="-1"></a><span class="co">#&gt;  [65,] 6.494857 78.59812</span></span>
+<span id="cb3-80"><a href="#cb3-80" tabindex="-1"></a><span class="co">#&gt;  [66,] 6.516707 78.72867</span></span>
+<span id="cb3-81"><a href="#cb3-81" tabindex="-1"></a><span class="co">#&gt;  [67,] 6.573915 79.52274</span></span>
+<span id="cb3-82"><a href="#cb3-82" tabindex="-1"></a><span class="co">#&gt;  [68,] 6.586221 77.68386</span></span>
+<span id="cb3-83"><a href="#cb3-83" tabindex="-1"></a><span class="co">#&gt;  [69,] 6.562137 79.14919</span></span>
+<span id="cb3-84"><a href="#cb3-84" tabindex="-1"></a><span class="co">#&gt;  [70,] 6.503000 77.94425</span></span>
+<span id="cb3-85"><a href="#cb3-85" tabindex="-1"></a><span class="co">#&gt;  [71,] 6.302027 73.91930</span></span>
+<span id="cb3-86"><a href="#cb3-86" tabindex="-1"></a><span class="co">#&gt;  [72,] 6.331200 74.05489</span></span>
+<span id="cb3-87"><a href="#cb3-87" tabindex="-1"></a><span class="co">#&gt;  [73,] 6.608421 82.09916</span></span>
+<span id="cb3-88"><a href="#cb3-88" tabindex="-1"></a><span class="co">#&gt;  [74,] 6.366502 76.02285</span></span>
+<span id="cb3-89"><a href="#cb3-89" tabindex="-1"></a><span class="co">#&gt;  [75,] 6.460894 78.05847</span></span>
+<span id="cb3-90"><a href="#cb3-90" tabindex="-1"></a><span class="co">#&gt;  [76,] 6.650756 81.05350</span></span>
+<span id="cb3-91"><a href="#cb3-91" tabindex="-1"></a><span class="co">#&gt;  [77,] 6.396678 76.00004</span></span>
+<span id="cb3-92"><a href="#cb3-92" tabindex="-1"></a><span class="co">#&gt;  [78,] 6.669725 83.21845</span></span>
+<span id="cb3-93"><a href="#cb3-93" tabindex="-1"></a><span class="co">#&gt;  [79,] 6.489937 76.85727</span></span>
+<span id="cb3-94"><a href="#cb3-94" tabindex="-1"></a><span class="co">#&gt;  [80,] 6.345179 73.72578</span></span>
+<span id="cb3-95"><a href="#cb3-95" tabindex="-1"></a><span class="co">#&gt;  [81,] 6.584875 78.15796</span></span>
+<span id="cb3-96"><a href="#cb3-96" tabindex="-1"></a><span class="co">#&gt;  [82,] 6.446954 75.10896</span></span>
+<span id="cb3-97"><a href="#cb3-97" tabindex="-1"></a><span class="co">#&gt;  [83,] 6.626282 81.83550</span></span>
+<span id="cb3-98"><a href="#cb3-98" tabindex="-1"></a><span class="co">#&gt;  [84,] 6.342474 75.86291</span></span>
+<span id="cb3-99"><a href="#cb3-99" tabindex="-1"></a><span class="co">#&gt;  [85,] 6.384315 76.69524</span></span>
+<span id="cb3-100"><a href="#cb3-100" tabindex="-1"></a><span class="co">#&gt;  [86,] 6.650091 82.22226</span></span>
+<span id="cb3-101"><a href="#cb3-101" tabindex="-1"></a><span class="co">#&gt;  [87,] 6.421994 76.52620</span></span>
+<span id="cb3-102"><a href="#cb3-102" tabindex="-1"></a><span class="co">#&gt;  [88,] 6.387825 74.87713</span></span>
+<span id="cb3-103"><a href="#cb3-103" tabindex="-1"></a><span class="co">#&gt;  [89,] 6.640525 82.16426</span></span>
+<span id="cb3-104"><a href="#cb3-104" tabindex="-1"></a><span class="co">#&gt;  [90,] 6.566582 79.04441</span></span>
+<span id="cb3-105"><a href="#cb3-105" tabindex="-1"></a><span class="co">#&gt;  [91,] 6.430336 75.28110</span></span>
+<span id="cb3-106"><a href="#cb3-106" tabindex="-1"></a><span class="co">#&gt;  [92,] 6.413305 77.23437</span></span>
+<span id="cb3-107"><a href="#cb3-107" tabindex="-1"></a><span class="co">#&gt;  [93,] 6.576082 80.55578</span></span>
+<span id="cb3-108"><a href="#cb3-108" tabindex="-1"></a><span class="co">#&gt;  [94,] 6.514148 79.55891</span></span>
+<span id="cb3-109"><a href="#cb3-109" tabindex="-1"></a><span class="co">#&gt;  [95,] 6.470357 79.07521</span></span>
+<span id="cb3-110"><a href="#cb3-110" tabindex="-1"></a><span class="co">#&gt;  [96,] 6.514918 79.52686</span></span>
+<span id="cb3-111"><a href="#cb3-111" tabindex="-1"></a><span class="co">#&gt;  [97,] 6.460935 78.60717</span></span>
+<span id="cb3-112"><a href="#cb3-112" tabindex="-1"></a><span class="co">#&gt;  [98,] 6.418221 77.74893</span></span>
+<span id="cb3-113"><a href="#cb3-113" tabindex="-1"></a><span class="co">#&gt;  [99,] 6.443695 75.74933</span></span>
+<span id="cb3-114"><a href="#cb3-114" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)attr(,&quot;requested_B&quot;)</span></span>
+<span id="cb3-115"><a href="#cb3-115" tabindex="-1"></a><span class="co">#&gt; [1] 99</span></span>
+<span id="cb3-116"><a href="#cb3-116" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)attr(,&quot;successful_B&quot;)</span></span>
+<span id="cb3-117"><a href="#cb3-117" tabindex="-1"></a><span class="co">#&gt; [1] 99</span></span>
+<span id="cb3-118"><a href="#cb3-118" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)attr(,&quot;bootstrap_type&quot;)</span></span>
+<span id="cb3-119"><a href="#cb3-119" tabindex="-1"></a><span class="co">#&gt; [1] &quot;wild&quot;</span></span>
+<span id="cb3-120"><a href="#cb3-120" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)attr(,&quot;wild_weights&quot;)</span></span>
+<span id="cb3-121"><a href="#cb3-121" tabindex="-1"></a><span class="co">#&gt; [1] &quot;mammen&quot;</span></span>
+<span id="cb3-122"><a href="#cb3-122" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)attr(,&quot;se_draws&quot;)</span></span>
+<span id="cb3-123"><a href="#cb3-123" tabindex="-1"></a><span class="co">#&gt;              Vmax       Km</span></span>
+<span id="cb3-124"><a href="#cb3-124" tabindex="-1"></a><span class="co">#&gt;   [1,] 0.07896411 2.125631</span></span>
+<span id="cb3-125"><a href="#cb3-125" tabindex="-1"></a><span class="co">#&gt;   [2,] 0.09955738 2.639596</span></span>
+<span id="cb3-126"><a href="#cb3-126" tabindex="-1"></a><span class="co">#&gt;   [3,] 0.07422150 1.964063</span></span>
+<span id="cb3-127"><a href="#cb3-127" tabindex="-1"></a><span class="co">#&gt;   [4,] 0.07742805 2.067672</span></span>
+<span id="cb3-128"><a href="#cb3-128" tabindex="-1"></a><span class="co">#&gt;   [5,] 0.08614270 2.243363</span></span>
+<span id="cb3-129"><a href="#cb3-129" tabindex="-1"></a><span class="co">#&gt;   [6,] 0.08668986 2.282228</span></span>
+<span id="cb3-130"><a href="#cb3-130" tabindex="-1"></a><span class="co">#&gt;   [7,] 0.07637235 2.073948</span></span>
+<span id="cb3-131"><a href="#cb3-131" tabindex="-1"></a><span class="co">#&gt;   [8,] 0.06823357 1.845857</span></span>
+<span id="cb3-132"><a href="#cb3-132" tabindex="-1"></a><span class="co">#&gt;   [9,] 0.05893586 1.587156</span></span>
+<span id="cb3-133"><a href="#cb3-133" tabindex="-1"></a><span class="co">#&gt;  [10,] 0.05867326 1.548303</span></span>
+<span id="cb3-134"><a href="#cb3-134" tabindex="-1"></a><span class="co">#&gt;  [11,] 0.07800671 2.104257</span></span>
+<span id="cb3-135"><a href="#cb3-135" tabindex="-1"></a><span class="co">#&gt;  [12,] 0.06530358 1.768328</span></span>
+<span id="cb3-136"><a href="#cb3-136" tabindex="-1"></a><span class="co">#&gt;  [13,] 0.10173770 2.758088</span></span>
+<span id="cb3-137"><a href="#cb3-137" tabindex="-1"></a><span class="co">#&gt;  [14,] 0.06575182 1.737225</span></span>
+<span id="cb3-138"><a href="#cb3-138" tabindex="-1"></a><span class="co">#&gt;  [15,] 0.07425155 2.010344</span></span>
+<span id="cb3-139"><a href="#cb3-139" tabindex="-1"></a><span class="co">#&gt;  [16,] 0.08935296 2.448370</span></span>
+<span id="cb3-140"><a href="#cb3-140" tabindex="-1"></a><span class="co">#&gt;  [17,] 0.08548524 2.202375</span></span>
+<span id="cb3-141"><a href="#cb3-141" tabindex="-1"></a><span class="co">#&gt;  [18,] 0.07582336 2.023130</span></span>
+<span id="cb3-142"><a href="#cb3-142" tabindex="-1"></a><span class="co">#&gt;  [19,] 0.11999732 3.168914</span></span>
+<span id="cb3-143"><a href="#cb3-143" tabindex="-1"></a><span class="co">#&gt;  [20,] 0.06549757 1.728109</span></span>
+<span id="cb3-144"><a href="#cb3-144" tabindex="-1"></a><span class="co">#&gt;  [21,] 0.07427692 2.011905</span></span>
+<span id="cb3-145"><a href="#cb3-145" tabindex="-1"></a><span class="co">#&gt;  [22,] 0.08322917 2.227897</span></span>
+<span id="cb3-146"><a href="#cb3-146" tabindex="-1"></a><span class="co">#&gt;  [23,] 0.08428093 2.301975</span></span>
+<span id="cb3-147"><a href="#cb3-147" tabindex="-1"></a><span class="co">#&gt;  [24,] 0.06044840 1.604516</span></span>
+<span id="cb3-148"><a href="#cb3-148" tabindex="-1"></a><span class="co">#&gt;  [25,] 0.08932149 2.338932</span></span>
+<span id="cb3-149"><a href="#cb3-149" tabindex="-1"></a><span class="co">#&gt;  [26,] 0.09664879 2.530503</span></span>
+<span id="cb3-150"><a href="#cb3-150" tabindex="-1"></a><span class="co">#&gt;  [27,] 0.07552568 2.049836</span></span>
+<span id="cb3-151"><a href="#cb3-151" tabindex="-1"></a><span class="co">#&gt;  [28,] 0.07533591 2.000458</span></span>
+<span id="cb3-152"><a href="#cb3-152" tabindex="-1"></a><span class="co">#&gt;  [29,] 0.09040235 2.416147</span></span>
+<span id="cb3-153"><a href="#cb3-153" tabindex="-1"></a><span class="co">#&gt;  [30,] 0.08725155 2.365933</span></span>
+<span id="cb3-154"><a href="#cb3-154" tabindex="-1"></a><span class="co">#&gt;  [31,] 0.07671611 2.074028</span></span>
+<span id="cb3-155"><a href="#cb3-155" tabindex="-1"></a><span class="co">#&gt;  [32,] 0.09902239 2.612996</span></span>
+<span id="cb3-156"><a href="#cb3-156" tabindex="-1"></a><span class="co">#&gt;  [33,] 0.06141988 1.628978</span></span>
+<span id="cb3-157"><a href="#cb3-157" tabindex="-1"></a><span class="co">#&gt;  [34,] 0.07803186 2.103424</span></span>
+<span id="cb3-158"><a href="#cb3-158" tabindex="-1"></a><span class="co">#&gt;  [35,] 0.06562838 1.752649</span></span>
+<span id="cb3-159"><a href="#cb3-159" tabindex="-1"></a><span class="co">#&gt;  [36,] 0.08256394 2.278650</span></span>
+<span id="cb3-160"><a href="#cb3-160" tabindex="-1"></a><span class="co">#&gt;  [37,] 0.07772661 2.063804</span></span>
+<span id="cb3-161"><a href="#cb3-161" tabindex="-1"></a><span class="co">#&gt;  [38,] 0.07727156 2.095708</span></span>
+<span id="cb3-162"><a href="#cb3-162" tabindex="-1"></a><span class="co">#&gt;  [39,] 0.08872766 2.348603</span></span>
+<span id="cb3-163"><a href="#cb3-163" tabindex="-1"></a><span class="co">#&gt;  [40,] 0.07752139 2.050175</span></span>
+<span id="cb3-164"><a href="#cb3-164" tabindex="-1"></a><span class="co">#&gt;  [41,] 0.06387544 1.697629</span></span>
+<span id="cb3-165"><a href="#cb3-165" tabindex="-1"></a><span class="co">#&gt;  [42,] 0.07191683 1.902528</span></span>
+<span id="cb3-166"><a href="#cb3-166" tabindex="-1"></a><span class="co">#&gt;  [43,] 0.07888983 2.037952</span></span>
+<span id="cb3-167"><a href="#cb3-167" tabindex="-1"></a><span class="co">#&gt;  [44,] 0.06299732 1.670969</span></span>
+<span id="cb3-168"><a href="#cb3-168" tabindex="-1"></a><span class="co">#&gt;  [45,] 0.06242575 1.646455</span></span>
+<span id="cb3-169"><a href="#cb3-169" tabindex="-1"></a><span class="co">#&gt;  [46,] 0.06508498 1.718456</span></span>
+<span id="cb3-170"><a href="#cb3-170" tabindex="-1"></a><span class="co">#&gt;  [47,] 0.06257440 1.635569</span></span>
+<span id="cb3-171"><a href="#cb3-171" tabindex="-1"></a><span class="co">#&gt;  [48,] 0.09850419 2.655659</span></span>
+<span id="cb3-172"><a href="#cb3-172" tabindex="-1"></a><span class="co">#&gt;  [49,] 0.09907482 2.566971</span></span>
+<span id="cb3-173"><a href="#cb3-173" tabindex="-1"></a><span class="co">#&gt;  [50,] 0.07085873 1.934034</span></span>
+<span id="cb3-174"><a href="#cb3-174" tabindex="-1"></a><span class="co">#&gt;  [51,] 0.08819083 2.240165</span></span>
+<span id="cb3-175"><a href="#cb3-175" tabindex="-1"></a><span class="co">#&gt;  [52,] 0.05810949 1.552373</span></span>
+<span id="cb3-176"><a href="#cb3-176" tabindex="-1"></a><span class="co">#&gt;  [53,] 0.11045249 2.928147</span></span>
+<span id="cb3-177"><a href="#cb3-177" tabindex="-1"></a><span class="co">#&gt;  [54,] 0.06817661 1.812504</span></span>
+<span id="cb3-178"><a href="#cb3-178" tabindex="-1"></a><span class="co">#&gt;  [55,] 0.06925145 1.835590</span></span>
+<span id="cb3-179"><a href="#cb3-179" tabindex="-1"></a><span class="co">#&gt;  [56,] 0.08225971 2.217318</span></span>
+<span id="cb3-180"><a href="#cb3-180" tabindex="-1"></a><span class="co">#&gt;  [57,] 0.08665545 2.226723</span></span>
+<span id="cb3-181"><a href="#cb3-181" tabindex="-1"></a><span class="co">#&gt;  [58,] 0.10421884 2.741945</span></span>
+<span id="cb3-182"><a href="#cb3-182" tabindex="-1"></a><span class="co">#&gt;  [59,] 0.08618070 2.310976</span></span>
+<span id="cb3-183"><a href="#cb3-183" tabindex="-1"></a><span class="co">#&gt;  [60,] 0.07488379 1.961209</span></span>
+<span id="cb3-184"><a href="#cb3-184" tabindex="-1"></a><span class="co">#&gt;  [61,] 0.09262671 2.403903</span></span>
+<span id="cb3-185"><a href="#cb3-185" tabindex="-1"></a><span class="co">#&gt;  [62,] 0.06261360 1.649769</span></span>
+<span id="cb3-186"><a href="#cb3-186" tabindex="-1"></a><span class="co">#&gt;  [63,] 0.10723445 2.886701</span></span>
+<span id="cb3-187"><a href="#cb3-187" tabindex="-1"></a><span class="co">#&gt;  [64,] 0.07839217 2.119853</span></span>
+<span id="cb3-188"><a href="#cb3-188" tabindex="-1"></a><span class="co">#&gt;  [65,] 0.08597096 2.313939</span></span>
+<span id="cb3-189"><a href="#cb3-189" tabindex="-1"></a><span class="co">#&gt;  [66,] 0.08657301 2.325617</span></span>
+<span id="cb3-190"><a href="#cb3-190" tabindex="-1"></a><span class="co">#&gt;  [67,] 0.09205711 2.472465</span></span>
+<span id="cb3-191"><a href="#cb3-191" tabindex="-1"></a><span class="co">#&gt;  [68,] 0.09127409 2.398549</span></span>
+<span id="cb3-192"><a href="#cb3-192" tabindex="-1"></a><span class="co">#&gt;  [69,] 0.11554587 3.096451</span></span>
+<span id="cb3-193"><a href="#cb3-193" tabindex="-1"></a><span class="co">#&gt;  [70,] 0.05606194 1.496343</span></span>
+<span id="cb3-194"><a href="#cb3-194" tabindex="-1"></a><span class="co">#&gt;  [71,] 0.06626550 1.744286</span></span>
+<span id="cb3-195"><a href="#cb3-195" tabindex="-1"></a><span class="co">#&gt;  [72,] 0.09364000 2.457348</span></span>
+<span id="cb3-196"><a href="#cb3-196" tabindex="-1"></a><span class="co">#&gt;  [73,] 0.08854864 2.430871</span></span>
+<span id="cb3-197"><a href="#cb3-197" tabindex="-1"></a><span class="co">#&gt;  [74,] 0.07842500 2.093052</span></span>
+<span id="cb3-198"><a href="#cb3-198" tabindex="-1"></a><span class="co">#&gt;  [75,] 0.06958700 1.871779</span></span>
+<span id="cb3-199"><a href="#cb3-199" tabindex="-1"></a><span class="co">#&gt;  [76,] 0.10809603 2.916642</span></span>
+<span id="cb3-200"><a href="#cb3-200" tabindex="-1"></a><span class="co">#&gt;  [77,] 0.07211093 1.914969</span></span>
+<span id="cb3-201"><a href="#cb3-201" tabindex="-1"></a><span class="co">#&gt;  [78,] 0.07797229 2.145389</span></span>
+<span id="cb3-202"><a href="#cb3-202" tabindex="-1"></a><span class="co">#&gt;  [79,] 0.09018659 2.383281</span></span>
+<span id="cb3-203"><a href="#cb3-203" tabindex="-1"></a><span class="co">#&gt;  [80,] 0.09668719 2.522096</span></span>
+<span id="cb3-204"><a href="#cb3-204" tabindex="-1"></a><span class="co">#&gt;  [81,] 0.10157380 2.683644</span></span>
+<span id="cb3-205"><a href="#cb3-205" tabindex="-1"></a><span class="co">#&gt;  [82,] 0.08808659 2.297706</span></span>
+<span id="cb3-206"><a href="#cb3-206" tabindex="-1"></a><span class="co">#&gt;  [83,] 0.08240701 2.250011</span></span>
+<span id="cb3-207"><a href="#cb3-207" tabindex="-1"></a><span class="co">#&gt;  [84,] 0.06953957 1.859596</span></span>
+<span id="cb3-208"><a href="#cb3-208" tabindex="-1"></a><span class="co">#&gt;  [85,] 0.07823252 2.097802</span></span>
+<span id="cb3-209"><a href="#cb3-209" tabindex="-1"></a><span class="co">#&gt;  [86,] 0.07419646 2.026685</span></span>
+<span id="cb3-210"><a href="#cb3-210" tabindex="-1"></a><span class="co">#&gt;  [87,] 0.06077816 1.617153</span></span>
+<span id="cb3-211"><a href="#cb3-211" tabindex="-1"></a><span class="co">#&gt;  [88,] 0.09364166 2.458713</span></span>
+<span id="cb3-212"><a href="#cb3-212" tabindex="-1"></a><span class="co">#&gt;  [89,] 0.07994559 2.185559</span></span>
+<span id="cb3-213"><a href="#cb3-213" tabindex="-1"></a><span class="co">#&gt;  [90,] 0.10719265 2.867415</span></span>
+<span id="cb3-214"><a href="#cb3-214" tabindex="-1"></a><span class="co">#&gt;  [91,] 0.06086198 1.594782</span></span>
+<span id="cb3-215"><a href="#cb3-215" tabindex="-1"></a><span class="co">#&gt;  [92,] 0.08183798 2.197661</span></span>
+<span id="cb3-216"><a href="#cb3-216" tabindex="-1"></a><span class="co">#&gt;  [93,] 0.08437865 2.290519</span></span>
+<span id="cb3-217"><a href="#cb3-217" tabindex="-1"></a><span class="co">#&gt;  [94,] 0.09318334 2.526653</span></span>
+<span id="cb3-218"><a href="#cb3-218" tabindex="-1"></a><span class="co">#&gt;  [95,] 0.06158949 1.672582</span></span>
+<span id="cb3-219"><a href="#cb3-219" tabindex="-1"></a><span class="co">#&gt;  [96,] 0.09116752 2.470855</span></span>
+<span id="cb3-220"><a href="#cb3-220" tabindex="-1"></a><span class="co">#&gt;  [97,] 0.07118991 1.926350</span></span>
+<span id="cb3-221"><a href="#cb3-221" tabindex="-1"></a><span class="co">#&gt;  [98,] 0.09350869 2.523393</span></span>
+<span id="cb3-222"><a href="#cb3-222" tabindex="-1"></a><span class="co">#&gt;  [99,] 0.08867746 2.331137</span></span>
+<span id="cb3-223"><a href="#cb3-223" tabindex="-1"></a><span class="co">#&gt; attr(,&quot;bootstrap_draws&quot;)attr(,&quot;bootstrap_ci&quot;)</span></span>
+<span id="cb3-224"><a href="#cb3-224" tabindex="-1"></a><span class="co">#&gt; [1] &quot;studentized&quot;</span></span>
+<span id="cb3-225"><a href="#cb3-225" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">predict</span>(fit, <span class="at">newdata =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">80</span>, <span class="at">length.out =</span> <span class="dv">6</span>), <span class="at">interval =</span> <span class="st">&quot;prediction&quot;</span>))</span>
+<span id="cb3-226"><a href="#cb3-226" tabindex="-1"></a><span class="co">#&gt;    x      fit     se.fit working_variance           lwr          upr</span></span>
+<span id="cb3-227"><a href="#cb3-227" tabindex="-1"></a><span class="co">#&gt; 1  0 0.000000 0.00000000     1.095100e-11 -6.485970e-06 6.485970e-06</span></span>
+<span id="cb3-228"><a href="#cb3-228" tabindex="-1"></a><span class="co">#&gt; 2 16 1.109281 0.01583297     4.380399e-03  9.759019e-01 1.242661e+00</span></span>
+<span id="cb3-229"><a href="#cb3-229" tabindex="-1"></a><span class="co">#&gt; 3 32 1.892795 0.02130898     6.194819e-03  1.732978e+00 2.052612e+00</span></span>
+<span id="cb3-230"><a href="#cb3-230" tabindex="-1"></a><span class="co">#&gt; 4 48 2.475671 0.02288928     7.587073e-03  2.299154e+00 2.652187e+00</span></span>
+<span id="cb3-231"><a href="#cb3-231" tabindex="-1"></a><span class="co">#&gt; 5 64 2.926229 0.02321708     8.760797e-03  2.737219e+00 3.115239e+00</span></span>
+<span id="cb3-232"><a href="#cb3-232" tabindex="-1"></a><span class="co">#&gt; 6 80 3.284933 0.02342394     9.794869e-03  3.085598e+00 3.484267e+00</span></span></code></pre></div>
 <p>For a one-step console summary plus a 95% confidence band, use:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">report_mm</span>(fit, <span class="at">interval_type =</span> <span class="st">&quot;confidence&quot;</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">report_mm</span>(fit, <span class="at">method =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">B =</span> <span class="dv">99</span>, <span class="at">seed =</span> <span class="dv">1</span>,</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>          <span class="at">interval_type =</span> <span class="st">&quot;confidence&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">report_mm</span>(fit, <span class="at">interval_type =</span> <span class="st">&quot;confidence&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">report_mm</span>(fit, <span class="at">method =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">B =</span> <span class="dv">99</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>          <span class="at">interval_type =</span> <span class="st">&quot;confidence&quot;</span>)</span></code></pre></div>
 </div>
 <div id="screening-working-variance-models" class="section level2">
 <h2>Screening working variance models</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>screen <span class="ot">&lt;-</span> <span class="fu">screen_mm</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">x =</span> one_curve<span class="sc">$</span>s_uM,</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">y =</span> one_curve<span class="sc">$</span>v_uM_per_min,</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">power_values =</span> <span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>),</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="at">include_auto =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>)</span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>screen<span class="sc">$</span>table[, <span class="fu">c</span>(<span class="st">&quot;model&quot;</span>, <span class="st">&quot;selected_model&quot;</span>, <span class="st">&quot;quasi_aic&quot;</span>, <span class="st">&quot;quasi_bic&quot;</span>, <span class="st">&quot;rmse&quot;</span>)]</span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt;             model selected_model quasi_aic quasi_bic      rmse</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; 1 auto(quasi_aic)    power(0.85) -46.89897 -42.90235 0.1212890</span></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; 2      power(0.6)     power(0.6) -45.92753 -41.93092 0.1199642</span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; 3            sqrt           sqrt -44.87655 -40.87994 0.1197806</span></span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; 4      power(0.4)     power(0.4) -43.41216 -39.41554 0.1196889</span></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; 5        cuberoot       cuberoot -42.20181 -38.20520 0.1196584</span></span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; 6             log            log -40.20657 -36.20995 0.1196680</span></span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; 7        constant       constant -33.44685 -29.45023 0.1196306</span></span></code></pre></div>
+<p>The default <code>fit_mm()</code> call combines the four-shape
+comparison and selected fit. The standalone <code>screen_mm()</code>
+function also supports expanded sets of fixed power exponents and
+user-defined functions, and retains all successful candidate fits:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>screen <span class="ot">&lt;-</span> <span class="fu">screen_mm</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="at">x =</span> one_curve<span class="sc">$</span>s_uM,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">y =</span> one_curve<span class="sc">$</span>v_uM_per_min,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">power_values =</span> <span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">include_auto =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>screen<span class="sc">$</span>table[, <span class="fu">c</span>(<span class="st">&quot;model&quot;</span>, <span class="st">&quot;selected_model&quot;</span>, <span class="st">&quot;quasi_aic&quot;</span>, <span class="st">&quot;quasi_bic&quot;</span>, <span class="st">&quot;rmse&quot;</span>)]</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt;             model selected_model quasi_aic quasi_bic      rmse</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; 1 auto(quasi_aic)       power(1) -66.28789 -61.89068 0.1183823</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; 2      power(0.6)     power(0.6) -62.69370 -58.29649 0.1130041</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; 3            sqrt           sqrt -60.71156 -56.31436 0.1126654</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; 4      power(0.4)     power(0.4) -58.21667 -53.81946 0.1124840</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; 5        cuberoot       cuberoot -56.26105 -51.86384 0.1124182</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; 6             log            log -53.98475 -49.58754 0.1124352</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; 7        constant       constant -43.10122 -38.70401 0.1123490</span></span></code></pre></div>
 <p>The screening table is ordered by quasi-AIC, with quasi-BIC and RMSE
 reported as secondary summaries.</p>
 </div>
+<div id="user-defined-fixed-variance-functions" class="section level2">
+<h2>User-defined fixed variance functions</h2>
+<p>For a single curve, a function can replace a built-in variance name.
+It defines the shape <code>h(S)</code> in
+<code>Var(Y | S) = gamma h(S)</code>, not the standard deviation.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>h <span class="ot">&lt;-</span> <span class="fu">variance_function</span>(<span class="cf">function</span>(S) <span class="dv">1</span> <span class="sc">+</span> S <span class="sc">/</span> <span class="dv">20</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>                       <span class="at">label =</span> <span class="st">&quot;Var = gamma (1 + S/20)&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>custom_fit <span class="ot">&lt;-</span> <span class="fu">fit_mm</span>(one_curve<span class="sc">$</span>s_uM, one_curve<span class="sc">$</span>v_uM_per_min, <span class="at">variance =</span> h)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="fu">summary</span>(custom_fit)</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; fit_mm(x = one_curve$s_uM, y = one_curve$v_uM_per_min, variance = h)</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; Method: profile-score </span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; Working variance: Var = gamma (1 + S/20) </span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; CI method: wald</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt;      Estimate Std. Error Lower CI Upper CI</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; Vmax  6.46149    0.09705  6.27128  6.65169</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; Km   77.17994    2.27530 72.72043 81.63946</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; Scale:0.00173  RMSE:0.11297  Weighted RSS:32</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; Quasi-AIC:-61.54838  Quasi-BIC:-57.15118</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="fu">confint</span>(custom_fit)</span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt;          lower     upper</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; Vmax  6.271282  6.651694</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; Km   72.720428 81.639456</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="fu">predict</span>(custom_fit, <span class="at">newdata =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">40</span>), <span class="at">interval =</span> <span class="st">&quot;prediction&quot;</span>)</span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt;    x       fit     se.fit working_variance         lwr        upr</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; 1  0 0.0000000 0.00000000      0.001730356 -0.08152969 0.08152969</span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt; 2 10 0.7411668 0.01062502      0.002595534  0.63916534 0.84316831</span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt; 3 40 2.2056635 0.01983918      0.005191067  2.05919426 2.35213278</span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a>custom_shapes <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a>  <span class="at">linear_floor =</span> <span class="cf">function</span>(S) <span class="dv">1</span> <span class="sc">+</span> S <span class="sc">/</span> <span class="dv">20</span>,</span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a>  <span class="at">saturation =</span> <span class="cf">function</span>(S) <span class="dv">1</span> <span class="sc">+</span> <span class="dv">9</span> <span class="sc">*</span> S <span class="sc">/</span> (<span class="dv">20</span> <span class="sc">+</span> S)</span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a>)</span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a>custom_screen <span class="ot">&lt;-</span> <span class="fu">screen_mm</span>(</span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a>  one_curve<span class="sc">$</span>s_uM, one_curve<span class="sc">$</span>v_uM_per_min,</span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a>  <span class="at">variance_models =</span> <span class="fu">c</span>(<span class="st">&quot;constant&quot;</span>, <span class="st">&quot;sqrt&quot;</span>),</span>
+<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a>  <span class="at">variance_functions =</span> custom_shapes, <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a>)</span>
+<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a>custom_screen<span class="sc">$</span>table[, <span class="fu">c</span>(<span class="st">&quot;model&quot;</span>, <span class="st">&quot;quasi_aic&quot;</span>, <span class="st">&quot;quasi_bic&quot;</span>, <span class="st">&quot;success&quot;</span>)]</span>
+<span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a><span class="co">#&gt;          model quasi_aic quasi_bic success</span></span>
+<span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a><span class="co">#&gt; 1 linear_floor -61.54838 -57.15118       1</span></span>
+<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a><span class="co">#&gt; 2         sqrt -60.71156 -56.31436       1</span></span>
+<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a><span class="co">#&gt; 3   saturation -53.66595 -49.26874       1</span></span>
+<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a><span class="co">#&gt; 4     constant -43.10122 -38.70401       1</span></span></code></pre></div>
+<p>The function must be deterministic, vectorized, and pointwise,
+returning one finite strictly positive numeric value for each input
+concentration, including zero if used. Values must not depend on the
+other concentrations in the vector. For example, a constant shape should
+return <code>rep(1, length(S))</code>, not a scalar. Invalid values or
+lengths cause errors; screening records candidate-specific errors and
+continues with the remaining candidates. Names must be unique and must
+not duplicate built-in candidates. For custom-only screening, specify
+<code>variance_models = character(0)</code>.</p>
+<p>Only Km requires numerical search for a fixed shape. Vmax and gamma
+retain their closed-form updates, and the function is reused for
+prediction and bootstrap refits. Internal scaling preserves the supplied
+variance model. The reported gamma is relative to the original shape, so
+its value changes inversely when the shape is multiplied by a positive
+constant.</p>
+<p>The constants 20 and 9 above are fixed, not estimated. Extra shape
+parameters, functions of unknown mean parameters, and data-adaptive
+nuisance estimation are not fitted by this interface. Intervals and
+information criteria condition on the supplied shape and omit external
+shape-estimation or selection uncertainty; prediction bands still use
+the working-normal approximation. User-defined variance shapes are not
+higher-moment efficient scores and do not imply smaller variance than
+identically weighted WNLS. They are currently supported for independent
+curves, not the clustered routine.</p>
+</div>
+<div id="optional-higher-moment-estimation-for-independent-curves" class="section level2">
+<h2>Optional higher-moment estimation for independent curves</h2>
+<p>The user-defined variance shape above does not by itself incorporate
+asymmetry into the estimating equations. Version 0.1.1 adds the separate
+<code>fit_mm_moments()</code> estimator, based on the conditional-moment
+construction of Kim and Ma (2012), Section 3 (<a href="doi:10.1007/s10463-011-0332-y" class="uri">doi:10.1007/s10463-011-0332-y</a>). It does not require a
+fully specified error density.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>skew_dat <span class="ot">&lt;-</span> <span class="fu">simulate_mm_data</span>(<span class="at">n =</span> <span class="dv">200</span>, <span class="at">error =</span> <span class="st">&quot;skewed&quot;</span>, <span class="at">skew_shape =</span> <span class="dv">4</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>assay_shape <span class="ot">&lt;-</span> <span class="cf">function</span>(S) <span class="dv">1</span> <span class="sc">+</span> <span class="dv">9</span> <span class="sc">*</span> S <span class="sc">/</span> (<span class="dv">20</span> <span class="sc">+</span> S)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>fit_hm <span class="ot">&lt;-</span> <span class="fu">fit_mm_moments</span>(skew_dat<span class="sc">$</span>x, skew_dat<span class="sc">$</span>y, <span class="at">variance =</span> assay_shape)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="fu">summary</span>(fit_hm)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; fit_mm_moments(x = skew_dat$x, y = skew_dat$y, variance = assay_shape)</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; Method: higher-moment estimating equations </span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; Working variance: Var = gamma h(S) (user-defined) </span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; Working moments: estimate </span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; Covariance: model </span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; CI method: wald </span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt;      Estimate Std. Error Lower CI  Upper CI</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; Vmax 99.32847    0.58349 98.18485 100.47210</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; Km   19.60062    0.36175 18.89160  20.30965</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; Variance scale: 0.9439  RMSE: 2.476 </span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; Scaled score norm: 8.5468e-10</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="fu">confint</span>(fit_hm)</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt;         lower     upper</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt; Vmax 98.18485 100.47210</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt; Km   18.89160  20.30965</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>fit_hm<span class="sc">$</span>vcov_joint</span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt;             Vmax           Km        gamma</span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt; Vmax  0.34046250  0.186485439  0.012018354</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt; Km    0.18648544  0.130864749 -0.005169235</span></span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt; gamma 0.01201835 -0.005169235  0.020383201</span></span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a></span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a>fit_gamma <span class="ot">&lt;-</span> <span class="fu">fit_mm_moments</span>(</span>
+<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a>  skew_dat<span class="sc">$</span>x, skew_dat<span class="sc">$</span>y, <span class="at">variance =</span> assay_shape,</span>
+<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a>  <span class="at">moments =</span> <span class="st">&quot;gamma&quot;</span>, <span class="at">shape =</span> <span class="dv">4</span></span>
+<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a>)</span>
+<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a><span class="fu">coef</span>(fit_gamma)</span>
+<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a><span class="co">#&gt;     Vmax       Km </span></span>
+<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a><span class="co">#&gt; 99.40513 19.64990</span></span>
+<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a><span class="fu">predict</span>(fit_gamma, <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">80</span>), <span class="at">interval =</span> <span class="st">&quot;confidence&quot;</span>)</span>
+<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a><span class="co">#&gt;    x      fit    se.fit working_variance      lwr      upr</span></span>
+<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a><span class="co">#&gt; 1 10 33.52629 0.2499221         3.771718 33.03645 34.01613</span></span>
+<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a><span class="co">#&gt; 2 20 50.14142 0.2391705         5.186112 49.67266 50.61019</span></span>
+<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a><span class="co">#&gt; 3 80 79.80349 0.2502522         7.732022 79.31301 80.29398</span></span></code></pre></div>
+<p>The default estimates constant standardized skewness and kurtosis
+from the profile pilot’s residuals. The gamma option supplies fixed
+working moments of <strong>centered</strong> gamma errors; it does not
+fit a gamma density. Student-t working moments use
+<code>moments = &quot;student_t&quot;, df = 10</code>. Custom standardized moment
+functions can be passed with <code>moments = &quot;custom&quot;</code>,
+<code>skewness</code>, and <code>kurtosis</code>; the latter is raw
+kurtosis, not excess kurtosis.</p>
+<p>For residual <span class="math inline">\(r_i\)</span> and variance
+<span class="math inline">\(v_i=\gamma h(S_i)\)</span>, let <span class="math inline">\(u_i=(r_i,r_i^2-v_i)^\top\)</span>. The conditional
+moment covariance is</p>
+<p><span class="math display">\[
+\Omega_i=\begin{pmatrix}
+v_i &amp; s_i v_i^{3/2}\\
+s_i v_i^{3/2} &amp; (k_i-1)v_i^2
+\end{pmatrix},
+\]</span></p>
+<p>where <span class="math inline">\(s_i\)</span> and <span class="math inline">\(k_i\)</span> are working skewness and kurtosis.
+With <span class="math inline">\(g_i\)</span> the MM mean gradient and
+<span class="math inline">\(D_i=\begin{pmatrix}g_{i1}&amp;g_{i2}&amp;0\\0&amp;0&amp;h(S_i)\end{pmatrix}\)</span>,
+the joint equation is <span class="math inline">\(\sum_i
+D_i^\top\Omega_i^{-1}u_i=0\)</span>. Positive definiteness requires
+<span class="math inline">\(k_i-1-s_i^2&gt;0\)</span>.</p>
+<p>Unlike the default profile route, the higher-moment fit solves
+jointly for <span class="math inline">\(V_{\max},K_m,\gamma\)</span>
+numerically. Its default <code>covariance = &quot;model&quot;</code> uses joint
+inverse working information, with the mean covariance extracted after
+allowing for the estimated scale. This interpretation requires
+appropriate conditional third and fourth moments. Optional
+<code>covariance = &quot;sandwich&quot;</code> uses the complete three-parameter
+equations. Wald intervals use a normal cutoff for the estimator, not an
+assumption that the individual errors are normal.</p>
+<p>Normal moments recover the original mean/variance equations. Constant
+symmetric Student-t moments recover the same point estimates; heavy
+tails alone do not give an efficiency improvement in this
+conditional-moment model. Under asymmetry, appropriate third/fourth
+moments can improve asymptotic efficiency, but pilot moment estimation
+can inflate finite-sample variance. Incorrect variance shapes can bias
+the new estimator, and a sandwich does not remove that bias. Neither
+exact 95% coverage nor uniform improvement is guaranteed.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">20</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">confint</span>(fit_hm, <span class="at">method =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">B =</span> <span class="dv">399</span>)  <span class="co"># pairs only</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="fu">report_mm</span>(fit_hm, <span class="at">interval_type =</span> <span class="st">&quot;confidence&quot;</span>)</span></code></pre></div>
+<p>Pairs bootstrap repeats the pilot and higher-moment estimation.
+Prediction bands are not supplied because a few moments do not identify
+predictive quantiles; mean-confidence bands are pointwise. Quasi-AIC/BIC
+are omitted for these non-likelihood roots. This opt-in estimator is not
+yet connected to grouped selection or clustered fitting; those workflows
+below retain their original estimators.</p>
+</div>
 <div id="grouped-analyses" class="section level2">
 <h2>Grouped analyses</h2>
+<p>Version 0.1.2 restores the lowest 3.90625 micromolar reactions:
+<code>sdl_demo</code> contains 192 rates, 32 per enzyme. The
+<code>replicate</code> column is the source-column occurrence ordinal
+within each concentration, not a verified sample, plate, run or batch
+identifier across concentrations. The source fluorescence CSV and
+data-preparation helper are included; the source package’s
+<code>inst/data-raw/README.md</code> gives the regeneration command and
+calibration.</p>
+<p><code>group_mm()</code> fits separate curves with distinct
+parameters, not a common-mean cluster model. Within each curve, its
+model-based intervals assume conditional independence and adequate
+working variance. Shared sample, experimental batch or calibration
+variation is not automatically included in those intervals. These
+assumptions cannot be verified from ordinal replicate labels alone.</p>
 <p>For real enzyme panels we often fit many curves at once and then
 compare the best model within each group.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>grouped <span class="ot">&lt;-</span> <span class="fu">group_mm</span>(</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="at">data =</span> sdl_demo,</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">s =</span> <span class="st">&quot;s_uM&quot;</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">v =</span> <span class="st">&quot;v_uM_per_min&quot;</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">groups =</span> <span class="st">&quot;enzyme&quot;</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="at">variance_models =</span> <span class="fu">c</span>(<span class="st">&quot;constant&quot;</span>, <span class="st">&quot;log&quot;</span>, <span class="st">&quot;sqrt&quot;</span>, <span class="st">&quot;cuberoot&quot;</span>),</span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="at">power_values =</span> <span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>),</span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="at">include_auto =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>)</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="fu">head</span>(grouped<span class="sc">$</span>comparison<span class="sc">$</span>best_by_group[, <span class="fu">c</span>(<span class="st">&quot;group_label&quot;</span>, <span class="st">&quot;model&quot;</span>, <span class="st">&quot;selected_model&quot;</span>, <span class="st">&quot;quasi_aic&quot;</span>, <span class="st">&quot;quasi_bic&quot;</span>, <span class="st">&quot;rmse&quot;</span>)])</span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt;   group_label           model selected_model  quasi_aic  quasi_bic       rmse</span></span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; 1 enzyme=1111 auto(quasi_aic)    power(0.85)  -46.89897  -42.90235 0.12128898</span></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; 2 enzyme=2222 auto(quasi_aic)       power(1) -106.50725 -102.51063 0.06072664</span></span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; 3 enzyme=3333 auto(quasi_aic)       power(1)  -96.64475  -92.64814 0.08058515</span></span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; 4 enzyme=4444 auto(quasi_aic)       power(1) -100.28551  -96.28890 0.06026349</span></span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; 5 enzyme=5555 auto(quasi_aic)       power(1)  -73.10378  -69.10717 0.09232693</span></span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; 6 enzyme=6666 auto(quasi_aic)       power(1)  -41.49399  -37.49737 0.15304469</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>grouped <span class="ot">&lt;-</span> <span class="fu">group_mm</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="at">data =</span> sdl_demo,</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="at">s =</span> <span class="st">&quot;s_uM&quot;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="at">v =</span> <span class="st">&quot;v_uM_per_min&quot;</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  <span class="at">groups =</span> <span class="st">&quot;enzyme&quot;</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  <span class="at">variance_models =</span> <span class="fu">c</span>(<span class="st">&quot;constant&quot;</span>, <span class="st">&quot;log&quot;</span>, <span class="st">&quot;sqrt&quot;</span>, <span class="st">&quot;cuberoot&quot;</span>),</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  <span class="at">power_values =</span> <span class="fu">c</span>(<span class="fl">0.4</span>, <span class="fl">0.6</span>),</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  <span class="at">include_auto =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>  <span class="at">variance_functions =</span> custom_shapes,</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>  <span class="at">quiet =</span> <span class="cn">TRUE</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>)</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="fu">head</span>(grouped<span class="sc">$</span>comparison<span class="sc">$</span>best_by_group[, <span class="fu">c</span>(<span class="st">&quot;group_label&quot;</span>, <span class="st">&quot;model&quot;</span>, <span class="st">&quot;selected_model&quot;</span>, <span class="st">&quot;quasi_aic&quot;</span>, <span class="st">&quot;quasi_bic&quot;</span>, <span class="st">&quot;rmse&quot;</span>)])</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt;   group_label           model selected_model  quasi_aic  quasi_bic       rmse</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt; 1 enzyme=1111 auto(quasi_aic)       power(1)  -66.28789  -61.89068 0.11838230</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="co">#&gt; 2 enzyme=2222 auto(quasi_aic)       power(1) -136.62452 -132.22731 0.05696519</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co">#&gt; 3 enzyme=3333 auto(quasi_aic)       power(1) -125.32709 -120.92988 0.07538179</span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="co">#&gt; 4 enzyme=4444 auto(quasi_aic)       power(1) -126.72010 -122.32290 0.05922529</span></span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a><span class="co">#&gt; 5 enzyme=5555 auto(quasi_aic)    power(0.95)  -92.50700  -88.10980 0.08460185</span></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a><span class="co">#&gt; 6 enzyme=6666 auto(quasi_aic)       power(1)  -54.67627  -50.27906 0.14448024</span></span></code></pre></div>
 <p>To visualize the current best model for each group, use the grouped
 plotting method.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">plot</span>(grouped, <span class="at">interval_type =</span> <span class="st">&quot;confidence&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">plot</span>(grouped, <span class="at">interval_type =</span> <span class="st">&quot;confidence&quot;</span>)</span></code></pre></div>
 </div>
 <div id="clustered-repeated-measurements" class="section level2">
 <h2>Clustered repeated measurements</h2>
-<p>For repeated or clustered assays, <code>cluster_mm()</code> uses a
-Ma-Genton-style working covariance with a random effect on
-<code>Vmax</code> and a low-dimensional residual variance function. The
-bundled <code>alves_demo</code> data illustrate the interface on a small
+<p>By default, <code>cluster_mm()</code> uses a rank-one working
+covariance with a random effect on <code>Vmax</code> and a
+low-dimensional residual variance function. The bundled
+<code>alves_demo</code> data illustrate the interface on a small
 soil-enzyme panel.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>cluster_fit <span class="ot">&lt;-</span> <span class="fu">cluster_mm</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">subset</span>(alves_demo, enzyme <span class="sc">==</span> <span class="st">&quot;BG&quot;</span>),</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">s =</span> <span class="st">&quot;substrate_conc&quot;</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">v =</span> <span class="st">&quot;activity&quot;</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="st">&quot;core&quot;</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="at">variance =</span> <span class="st">&quot;sqrt&quot;</span></span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>)</span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="fu">summary</span>(cluster_fit)</span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; cluster_mm(data = subset(alves_demo, enzyme == &quot;BG&quot;), s = &quot;substrate_conc&quot;, </span></span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt;     v = &quot;activity&quot;, cluster = &quot;core&quot;, variance = &quot;sqrt&quot;)</span></span>
-<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; Method: clustered-profile-score </span></span>
-<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt; Clusters: 3 </span></span>
-<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; Initialization: pooled variance-aware fit </span></span>
-<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; Converged: yes   Iterations: 4 </span></span>
-<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; Residual working variance: Var = gamma S^(1/2) </span></span>
-<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; CI method: disabled by default for sparse clustered fits</span></span>
-<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt;        Estimate</span></span>
-<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt; Vmax 1435.43759</span></span>
-<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt; Km     34.29102</span></span>
-<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt; Interval inference is disabled by default for sparse clustered fits (3 clusters, 7 distinct substrate concentrations). Default interval reporting requires at least 4 clusters and at least 6 distinct concentrations.</span></span>
-<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt; Tau^2:242368  Gamma:1303.433  RMSE:362.7108</span></span>
-<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt; Quasi-AIC:1136.631  Quasi-BIC:1146.109</span></span>
-<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a><span class="fu">confint</span>(cluster_fit)</span>
-<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a><span class="co">#&gt; Warning: Small-cluster warning: this fit uses 3 clusters across 7 distinct</span></span>
-<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a><span class="co">#&gt; substrate concentrations. Default interval reporting is disabled below 4</span></span>
-<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a><span class="co">#&gt; clusters or below 6 distinct concentrations because coverage may be unstable.</span></span>
-<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a><span class="co">#&gt; Use these intervals only as a sensitivity analysis.</span></span>
-<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a><span class="co">#&gt;          lower     upper</span></span>
-<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a><span class="co">#&gt; Vmax 874.21368 1996.6615</span></span>
-<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a><span class="co">#&gt; Km    29.34983   39.2322</span></span>
-<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">predict</span>(cluster_fit, <span class="at">newdata =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">700</span>, <span class="at">length.out =</span> <span class="dv">6</span>),</span>
-<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a>             <span class="at">interval =</span> <span class="st">&quot;confidence&quot;</span>))</span>
-<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a><span class="co">#&gt;     x      fit   se.fit working_variance marginal_variance      lwr      upr</span></span>
-<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a><span class="co">#&gt; 1   0    0.000   0.0000     1.303433e-05      1.303433e-05   0.0000    0.000</span></span>
-<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a><span class="co">#&gt; 2 140 1153.021 228.8684     1.542243e+04      1.718025e+05 704.4475 1601.595</span></span>
-<span id="cb7-43"><a href="#cb7-43" tabindex="-1"></a><span class="co">#&gt; 3 280 1278.823 254.2365     2.181061e+04      2.141763e+05 780.5285 1777.117</span></span>
-<span id="cb7-44"><a href="#cb7-44" tabindex="-1"></a><span class="co">#&gt; 4 420 1327.087 264.0631     2.671244e+04      2.338723e+05 809.5330 1844.641</span></span>
-<span id="cb7-45"><a href="#cb7-45" tabindex="-1"></a><span class="co">#&gt; 5 560 1352.612 269.2834     3.084487e+04      2.460502e+05 824.8260 1880.398</span></span>
-<span id="cb7-46"><a href="#cb7-46" tabindex="-1"></a><span class="co">#&gt; 6 700 1368.403 272.5217     3.448561e+04      2.547453e+05 834.2708 1902.536</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>cluster_fit <span class="ot">&lt;-</span> <span class="fu">cluster_mm</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">subset</span>(alves_demo, enzyme <span class="sc">==</span> <span class="st">&quot;BG&quot;</span>),</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">s =</span> <span class="st">&quot;substrate_conc&quot;</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">v =</span> <span class="st">&quot;activity&quot;</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="st">&quot;core&quot;</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="at">variance =</span> <span class="st">&quot;sqrt&quot;</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>)</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="fu">summary</span>(cluster_fit)</span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt; cluster_mm(data = subset(alves_demo, enzyme == &quot;BG&quot;), s = &quot;substrate_conc&quot;, </span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt;     v = &quot;activity&quot;, cluster = &quot;core&quot;, variance = &quot;sqrt&quot;)</span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a><span class="co">#&gt; Method: clustered-profile-score </span></span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a><span class="co">#&gt; Clusters: 3 </span></span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a><span class="co">#&gt; Initialization: pooled single-curve profile-score fit </span></span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a><span class="co">#&gt; Converged: yes   Iterations: 4 </span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a><span class="co">#&gt; Residual working variance: Var = gamma S^(1/2) </span></span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a><span class="co">#&gt; CI method: disabled by default for sparse clustered fits</span></span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a><span class="co">#&gt;        Estimate</span></span>
+<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a><span class="co">#&gt; Vmax 1435.43759</span></span>
+<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a><span class="co">#&gt; Km     34.29102</span></span>
+<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-26"><a href="#cb11-26" tabindex="-1"></a><span class="co">#&gt; Interval inference is disabled by default for sparse clustered fits (3 clusters, 7 distinct substrate concentrations). Default interval reporting requires at least 4 clusters and at least 6 distinct concentrations.</span></span>
+<span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a><span class="co">#&gt; Tau^2:242368  Gamma:1303.433  RMSE:362.7108</span></span>
+<span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a><span class="co">#&gt; Quasi-AIC:1136.631  Quasi-BIC:1146.109</span></span>
+<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a><span class="fu">confint</span>(cluster_fit)</span>
+<span id="cb11-31"><a href="#cb11-31" tabindex="-1"></a><span class="co">#&gt; Warning: Small-cluster warning: this fit uses 3 clusters across 7 distinct</span></span>
+<span id="cb11-32"><a href="#cb11-32" tabindex="-1"></a><span class="co">#&gt; substrate concentrations. Default interval reporting is disabled below 4</span></span>
+<span id="cb11-33"><a href="#cb11-33" tabindex="-1"></a><span class="co">#&gt; clusters or below 6 distinct concentrations because coverage may be unstable.</span></span>
+<span id="cb11-34"><a href="#cb11-34" tabindex="-1"></a><span class="co">#&gt; Use these intervals only as a sensitivity analysis.</span></span>
+<span id="cb11-35"><a href="#cb11-35" tabindex="-1"></a><span class="co">#&gt;          lower     upper</span></span>
+<span id="cb11-36"><a href="#cb11-36" tabindex="-1"></a><span class="co">#&gt; Vmax 874.21368 1996.6615</span></span>
+<span id="cb11-37"><a href="#cb11-37" tabindex="-1"></a><span class="co">#&gt; Km    29.34983   39.2322</span></span>
+<span id="cb11-38"><a href="#cb11-38" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">predict</span>(cluster_fit, <span class="at">newdata =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">700</span>, <span class="at">length.out =</span> <span class="dv">6</span>),</span>
+<span id="cb11-39"><a href="#cb11-39" tabindex="-1"></a>             <span class="at">interval =</span> <span class="st">&quot;confidence&quot;</span>))</span>
+<span id="cb11-40"><a href="#cb11-40" tabindex="-1"></a><span class="co">#&gt;     x      fit   se.fit working_variance marginal_variance      lwr      upr</span></span>
+<span id="cb11-41"><a href="#cb11-41" tabindex="-1"></a><span class="co">#&gt; 1   0    0.000   0.0000     1.303433e-05      1.303433e-05   0.0000    0.000</span></span>
+<span id="cb11-42"><a href="#cb11-42" tabindex="-1"></a><span class="co">#&gt; 2 140 1153.021 228.8684     1.542243e+04      1.718025e+05 704.4475 1601.595</span></span>
+<span id="cb11-43"><a href="#cb11-43" tabindex="-1"></a><span class="co">#&gt; 3 280 1278.823 254.2365     2.181061e+04      2.141763e+05 780.5285 1777.117</span></span>
+<span id="cb11-44"><a href="#cb11-44" tabindex="-1"></a><span class="co">#&gt; 4 420 1327.087 264.0631     2.671244e+04      2.338723e+05 809.5330 1844.641</span></span>
+<span id="cb11-45"><a href="#cb11-45" tabindex="-1"></a><span class="co">#&gt; 5 560 1352.612 269.2834     3.084487e+04      2.460502e+05 824.8260 1880.398</span></span>
+<span id="cb11-46"><a href="#cb11-46" tabindex="-1"></a><span class="co">#&gt; 6 700 1368.403 272.5217     3.448561e+04      2.547453e+05 834.2708 1902.536</span></span></code></pre></div>
 <p>Because the bundled example contains only three cores, the printed
 summary reports point estimates by default and treats interval output as
 an explicit sensitivity analysis.</p>
+<p>An optional <code>method = &quot;projected&quot;</code> uses an MM-specific
+adaptation of Ma and Genton (2010, Section 3.2), <a href="https://doi.org/10.1111/j.1467-9868.2010.00741.x" class="uri">https://doi.org/10.1111/j.1467-9868.2010.00741.x</a>. It
+leaves the random-effect density unspecified while retaining
+conditionally independent Gaussian residuals with a correct fixed
+variance shape. The identity-instrument projected score does not
+generally attain the semiparametric efficiency bound. Standard errors
+use a stacked independent-cluster sandwich, and only mean-confidence
+bands are returned. At least five clusters and two readings per cluster
+are required; this path is therefore not applied to the three-core
+example above. The package README provides a reproducible
+skewed-random-effect example. This is distinct from non-Gaussian
+independent residual estimation.</p>
+<p>Projected failures report a numerical stage, reason and available
+diagnostics in <code>inferMM_cluster_projected_error</code>; no estimate
+or interval is returned and no automatic method switch occurs. An
+incomplete numerical search can retain a verified interior root but
+warns explicitly. Inspect <code>fit$convergence</code>, especially the
+scaled joint score norm and search diagnostics. A non-positive
+variance-component moment has a separate reporting warning. For the
+default profile method, an iteration-limit warning marks
+<code>converged = FALSE</code>; such results should not be interpreted
+as converged fits.</p>
 </div>
 <div id="simulation" class="section level2">
 <h2>Simulation</h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>sim_dat <span class="ot">&lt;-</span> <span class="fu">simulate_mm_data</span>(<span class="at">seed =</span> <span class="dv">100</span>, <span class="at">variance_shape =</span> <span class="st">&quot;hill&quot;</span>, <span class="at">error =</span> <span class="st">&quot;skewed&quot;</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">head</span>(sim_dat)</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt;   x         y true_mean true_variance      error</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; 1 1  4.065991  4.761905      1.022444 -0.6882333</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; 2 2  7.609953  9.090909      1.089109 -1.4190785</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; 3 3 13.785376 13.043478      1.198044  0.6778096</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; 4 4 16.505541 16.666667      1.346154 -0.1388731</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; 5 5 20.075119 20.000000      1.529412  0.0607418</span></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; 6 6 22.084203 23.076923      1.743119 -0.7519053</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>sim_dat <span class="ot">&lt;-</span> <span class="fu">simulate_mm_data</span>(<span class="at">variance_shape =</span> <span class="st">&quot;hill&quot;</span>, <span class="at">error =</span> <span class="st">&quot;skewed&quot;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="fu">head</span>(sim_dat)</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt;   x         y true_mean true_variance      error</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; 1 1  4.065991  4.761905      1.022444 -0.6882333</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; 2 2  7.609953  9.090909      1.089109 -1.4190785</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; 3 3 13.785376 13.043478      1.198044  0.6778096</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; 4 4 16.505541 16.666667      1.346154 -0.1388731</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt; 5 5 20.075119 20.000000      1.529412  0.0607418</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt; 6 6 22.084203 23.076923      1.743119 -0.7519053</span></span></code></pre></div>
 <p>The package is intentionally lightweight: it relies only on base and
 recommended R packages, while keeping the workflow close to the
 heteroscedastic and clustered Michaelis-Menten analyses used in the
 companion methodology paper.</p>
+</div>
+<div id="data-sources-and-references" class="section level2">
+<h2>Data sources and references</h2>
+<p><code>sdl_demo</code> is derived from the fluorescence traces in
+Supplementary Data 4, worksheet <code>Michaelis-Menten_data</code>, of
+Rapp, J. T., Bremer, B. J., and Romero, P. A. (2024), <em>Self-driving
+laboratories to autonomously navigate the protein fitness
+landscape</em>, <strong>Nature Chemical Engineering 1</strong>, 97–107.
+<a href="https://doi.org/10.1038/s44286-023-00002-4" class="uri">https://doi.org/10.1038/s44286-023-00002-4</a>.</p>
+<p><code>alves_demo</code> is the prepared 0–10 cm, 10°C subset of the
+soil exoenzyme activity data underlying Alves, R. J. E., et al. (2021),
+<em>Kinetic Properties of Microbial Exoenzymes Vary With Soil Depth but
+Have Similar Temperature Sensitivities Through the Soil Profile</em>,
+<strong>Frontiers in Microbiology 12</strong>, 735282. <a href="https://doi.org/10.3389/fmicb.2021.735282" class="uri">https://doi.org/10.3389/fmicb.2021.735282</a>. The study
+data and code are supplied in Supplementary Material, Data Sheet 2
+(ZIP); the corrected activity table is
+<code>enzymeActivity_corr.csv</code>. Positive concentration/activity
+records at the selected depth and temperature are retained.</p>
+<p>The data help pages <code>?sdl_demo</code> and
+<code>?alves_demo</code>, also included in the PDF reference manual,
+give complete bibliographic references and data preparation details.
+Generated simulation examples are distinct from these observed data.</p>
 </div>
 
 
